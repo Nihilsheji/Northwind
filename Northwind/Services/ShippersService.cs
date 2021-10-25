@@ -12,6 +12,8 @@ namespace Northwind.Services
     {
         private readonly INorthwindDbContext _context;
 
-        public ShippersService(INorthwindDbContext context) : base(context) { }
+        public ShippersService(INorthwindDbContext context) : base(context) {
+            _context = context;
+        }
     }
 }

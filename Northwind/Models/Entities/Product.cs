@@ -11,15 +11,15 @@ namespace Northwind.Models.Entities
         public string ProductName { get; set; }
         public int SupplierId { get; set; }
         public int CategoryId { get; set; }
-        public decimal QuantityPerUnit { get; set; } //Could be int
+        public int QuantityPerUnit { get; set; }
         public decimal UnitPrice { get; set; }
         public int UnitsInStock { get; set; }
-        public int UnitsInOrder { get; set; }
+        public int UnitsOnOrder { get; set; }
         public int ReorderLevel { get; set; }
         public bool Discontinued { get; set; }
 
         public Category Category { get; set; }
         public Supplier Supplier { get; set; }
-        public IEnumerable<OrderDetails> OrderDetails { get; set; }
+        public ICollection<OrderDetails> OrderDetails { get; set; }
     }
 }

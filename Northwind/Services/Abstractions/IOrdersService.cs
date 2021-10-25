@@ -1,4 +1,7 @@
 ﻿using Northwind.Models.Entities;
+using Northwind.Models.Request;
+using Northwind.Models.Request.Order;
+using Northwind.Models.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,10 +11,14 @@ namespace Northwind.Services.Abstractions
 {
     public interface IOrdersService : ICrudServiceBase<Order>
     {
-        Task<IEnumerable<Order>> GetOrdersForEmployee(int employeeId);
-        Task<IEnumerable<Order>> GetOrdersForCustomer(int customerId);
-        Task<IEnumerable<Order>> GetOrdersForShipper(int shipperId);
-        Task<IEnumerable<Order>> GetOrdersForProduct(int productId);
+        Task<IEnumerable<OrderListView>> GetOrdersListViewForEmployee(int employeeId);
+        Task<IEnumerable<OrderListView>> GetOrdersListViewForCustomer(string customerId);
+        Task<IEnumerable<OrderListView>> GetOrdersListViewForShipper(int shipperId);
+        Task<IEnumerable<OrderListView>> GetOrdersListViewForProduct(int productId);
         Task<Order> GetOrderWithDetailsAndProducts(int orderId);
+        Task<IEnumerable<OrderListView>> GetOrdersListView();
+        Task<IEnumerable<OrderListView>> GetFilteredOrdersListView(GetRequest req);
+        Task<Order> CreateOrder(CreateOrderRequest req);
+        Task<bool> RemoveOrder(int orderId);
     }
 }

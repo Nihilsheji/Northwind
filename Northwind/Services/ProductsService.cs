@@ -1,12 +1,12 @@
 ﻿using Northwind.DbContexts;
 using Northwind.DbContexts.Queries;
 using Northwind.Models.Entities;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Northwind.Services.Abstractions;
+using Northwind.Models.Response;
 
 namespace Northwind.Services
 {
@@ -29,11 +29,49 @@ namespace Northwind.Services
             return result;
         }
 
+        public async Task<IEnumerable<ProductListView>> GetProductsListViewForSupplier(int supplierId)
+        {
+            var result = await _context.GetEntities(_context.GetDbSet<Product>(),
+                new GetQueryOptions<Product, ProductListView>()
+                {
+                    Filter = (Product x) => x.SupplierId == supplierId,
+                    Select = (IQueryable<Product> q) => q.Select((Product p) =>
+                        new ProductListView()
+                        {
+                            Id = p.Id,
+                            ProductName = p.ProductName,
+                            UnitPrice = p.UnitPrice
+                        }
+                    )
+                });
+
+            return result;
+        }
+
         public async Task<IEnumerable<Product>> GetProductsForCategory(int categoryId)
         {
             var result = await _context.GetEntities(_context.GetDbSet<Product>(),
                 new GetQueryOptions<Product>() {
                     Filter = (Product x) => x.CategoryId == categoryId
+                });
+
+            return result;
+        }
+
+        public async Task<IEnumerable<ProductListView>> GetProductsListViewForCategory(int categoryId)
+        {
+            var result = await _context.GetEntities(_context.GetDbSet<Product>(),
+                new GetQueryOptions<Product, ProductListView>()
+                {
+                    Filter = (Product x) => x.CategoryId == categoryId,
+                    Select = (IQueryable<Product> q) => q.Select((Product p) => 
+                        new ProductListView()
+                        {
+                            Id = p.Id,
+                            ProductName = p.ProductName,
+                            UnitPrice = p.UnitPrice
+                        }
+                    )
                 });
 
             return result;
@@ -50,6 +88,11 @@ namespace Northwind.Services
             });
 
             return result;
+        }
+
+        public async Task<IEnumerable<DictionaryValue<int, string>>> GetDictionary()
+        {
+            return await GetDictionary<int, string>((Product p) => new DictionaryValue<int, string>() { Key = p.Id, Value = p.ProductName });
         }
     }
 }

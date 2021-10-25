@@ -10,5 +10,7 @@ namespace Northwind.Services.Abstractions
     {
         Task<IEnumerable<Territory>> GetTerritoriesForRegion(int regionId);
         Task<IEnumerable<Territory>> GetTerritoriesForEmployee(int employeeId);
+        Task<bool> AddEmployeeToTerritory(int territoryId, int employeeId);
+        Task<bool> RemoveEmployeeFromTerritory(int territoryId, int employeeId);
     }
 }

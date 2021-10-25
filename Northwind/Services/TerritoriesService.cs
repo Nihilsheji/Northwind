@@ -3,7 +3,6 @@ using Northwind.DbContexts;
 using Northwind.DbContexts.Queries;
 using Northwind.Models.Entities;
 using Northwind.Services.Abstractions;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,11 +13,13 @@ namespace Northwind.Services
     {
         private readonly INorthwindDbContext _context;
 
-        public TerritoriesService(INorthwindDbContext context) : base(context) { }
+        public TerritoriesService(INorthwindDbContext context) : base(context) {
+            _context = context;
+        }
 
         public async Task<IEnumerable<Territory>> GetTerritoriesForRegion(int regionId)
         {
-            var result = await _context.GetEntities<Territory>(_context.GetDbSet<Territory>(), new GetQueryOptions<Territory>()
+            var result = await _context.GetEntities(_context.GetDbSet<Territory>(), new GetQueryOptions<Territory>()
             {
                 Filter = (Territory t) => t.RegionId == regionId
             });
@@ -28,7 +29,7 @@ namespace Northwind.Services
 
         public async Task<IEnumerable<Territory>> GetTerritoriesForEmployee(int employeeId)
         {
-            var demo = await _context.GetEntity<Employee>(_context.GetDbSet<Employee>(), new GetQueryOptions<Employee>()
+            var demo = await _context.GetEntity(_context.GetDbSet<Employee>(), new GetSingleQueryOptions<Employee>()
             {
                 Filter = (Employee d) => d.Id == employeeId,
                 Includes = (IQueryable<Employee> q) => 
@@ -36,6 +37,49 @@ namespace Northwind.Services
             });
 
             return demo.Territories;
+        }
+
+        public async Task<bool> AddEmployeeToTerritory(int territoryId, int employeeId) 
+        {
+            var terr = await _context.GetEntity(_context.GetDbSet<Territory>(), new GetSingleQueryOptions<Territory>()
+            {
+                Filter = (Territory t) => t.Id == territoryId,
+                Includes = (IQueryable<Territory> q) => q.Include((Territory t) => t.Employees)
+            });
+
+            var empl = await _context.GetEntity(_context.GetDbSet<Employee>(), employeeId);
+
+            if (terr == null || empl == null) return false;
+
+            if (terr.Employees == null)
+                terr.Employees = new List<Employee>();
+
+            terr.Employees.Add(empl);
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> RemoveEmployeeFromTerritory(int territoryId, int employeeId) 
+        {
+            var terr = await _context.GetEntity(_context.GetDbSet<Territory>(), new GetSingleQueryOptions<Territory>()
+            {
+                Filter = (Territory t) => t.Id == territoryId,
+                Includes = (IQueryable<Territory> q) => q.Include((Territory t) => t.Employees)
+            });
+
+            var empl = await _context.GetEntity(_context.GetDbSet<Employee>(), employeeId);
+
+            if (terr == null || empl == null) return false;
+
+            if (terr.Employees == null) return false;
+
+            terr.Employees.Remove(empl);
+
+            await _context.SaveChangesAsync();
+
+            return true;
         }
     }
 }

@@ -1,12 +1,13 @@
 ﻿using Northwind.Models.Entities;
-using System;
+using Northwind.Models.Response;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Northwind.Services.Abstractions
 {
     public interface ISuppliersService : ICrudServiceBase<Supplier>
     {
+        Task<IEnumerable<DictionaryValue<int, string>>> GetDictionary();
+        Task<IEnumerable<SupplierListView>> GetSuppliersListView();
     }
 }

@@ -12,6 +12,6 @@ namespace Northwind.Models.Entities
         public int RegionId { get; set; }
 
         public Region Region { get; set; }
-        public IEnumerable<Employee> Employees { get; set; }
+        public ICollection<Employee> Employees { get; set; }
     }
 }

@@ -8,12 +8,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
 using Northwind.DbContexts;
 using Northwind.Services;
 using Northwind.Services.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Northwind
@@ -30,8 +32,10 @@ namespace Northwind
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddDbContext<INorthwindDbContext, NorthwindDbContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("NorthwindDb")));
 
+            services.AddAutoMapper(typeof(Startup));
             services.AddScoped<ICategoriesService, CategoriesService>();
             services.AddScoped<ICustomersService, CustomersService>();
             services.AddScoped<IDemographicsService, DemographicsService>();
@@ -42,8 +46,11 @@ namespace Northwind
             services.AddScoped<IShippersService, ShippersService>();
             services.AddScoped<ISuppliersService, SuppliersService>();
             services.AddScoped<ITerritoriesService, TerritoriesService>();
+            services.AddScoped<IOrderDetailsService, OrderDetailsService>();
+            services.AddScoped<IReportsService, ReportsService>();
 
-            services.AddControllers();
+
+            services.AddControllers().AddNewtonsoftJson(x => x.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Northwind", Version = "v1" });

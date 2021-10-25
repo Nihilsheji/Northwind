@@ -12,8 +12,8 @@ namespace Northwind.Models.Entities
         public string FirstName { get; set; }
         public string Title { get; set; }
         public string TitleOfCourtesy { get; set; }
-        public DateTime BirthDate { get; set; }
-        public DateTime HireDate { get; set; }
+        public DateTime? BirthDate { get; set; }
+        public DateTime? HireDate { get; set; }
         public string Address { get; set; }
         public string City { get; set; }
         public string Region { get; set; }
@@ -21,15 +21,15 @@ namespace Northwind.Models.Entities
         public string Country { get; set; }
         public string HomePhone { get; set; }
         public string Extension { get; set; }
-        public byte[] Photo { get; set; } //? File/Blob
+        public string Photo { get; set; }
         public string Notes { get; set; }
         public string PhotoPath { get; set; }
-        public int ReportsToId { get; set; }
+        public int? ReportsToId { get; set; }
 
         public Employee ReportsTo { get; set; }
 
-        public IEnumerable<Employee> Subordinates { get; set; }
-        public IEnumerable<Order> Orders { get; set; }
-        public IEnumerable<Territory> Territories { get; set; }
+        public ICollection<Employee> Subordinates { get; set; }
+        public ICollection<Order> Orders { get; set; }
+        public ICollection<Territory> Territories { get; set; }
     }
 }

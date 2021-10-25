@@ -10,6 +10,6 @@ namespace Northwind.Models.Entities
         public int Id { get; set; }
         public string CustomerDesc { get; set; }
 
-        public IEnumerable<Customer> Customers { get; set; }
+        public ICollection<Customer> Customers { get; set; }
     }
 }

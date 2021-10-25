@@ -2,8 +2,8 @@
 using Northwind.DbContexts;
 using Northwind.DbContexts.Queries;
 using Northwind.Models.Entities;
+using Northwind.Models.Response;
 using Northwind.Services.Abstractions;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,11 +14,13 @@ namespace Northwind.Services
     {
         private readonly INorthwindDbContext _context;
 
-        public DemographicsService(INorthwindDbContext context) : base(context) { }
+        public DemographicsService(INorthwindDbContext context) : base(context) {
+            _context = context;
+        }
 
-        public async Task<IEnumerable<Demographic>> GetCustomersForDemographic(int demographicId)
+        public async Task<IEnumerable<Demographic>> GetCustomersForDemographic(string demographicId)
         {
-            var demo = await _context.GetEntity<Customer>(_context.GetDbSet<Customer>(), new GetQueryOptions<Customer>()
+            var demo = await _context.GetEntity<Customer>(_context.GetDbSet<Customer>(), new GetSingleQueryOptions<Customer>()
             {
                 Filter = (Customer d) => d.Id == demographicId,
                 Includes = (IQueryable<Customer> q) => 
@@ -26,6 +28,51 @@ namespace Northwind.Services
             });
 
             return demo.Demographics;
+        }
+
+        public async Task<IEnumerable<DictionaryValue<int, string>>> GetDictionary()
+        {
+            return await GetDictionary<int, string>((Demographic d) => new DictionaryValue<int, string>() { Key = d.Id, Value = d.CustomerDesc });
+        }
+
+        public async Task<bool> AddCustomerToDemographic(int demographicId, string customerId)
+        {
+            var demo = await _context.GetEntity(_context.GetDbSet<Demographic>(), demographicId);
+
+            var cust = await _context.GetEntity(_context.GetDbSet<Customer>(), customerId);
+
+            if (demo == null || cust == null) return false;
+
+            if (demo.Customers == null)
+                demo.Customers = new List<Customer>();
+
+            demo.Customers.Add(cust);
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> RemoveCustomerFromDemographic(int demographicId, string customerId)
+        {
+            var demo = await _context.GetEntity(_context.GetDbSet<Demographic>(), new GetSingleQueryOptions<Demographic>()
+            {
+                Filter = (Demographic d) => d.Id == demographicId,
+                Includes = (IQueryable<Demographic> q) =>
+                    q.Include(d => d.Customers)
+            });
+
+            var cust = await _context.GetEntity(_context.GetDbSet<Customer>(), customerId);
+
+            if (demo == null || cust == null) return false;
+
+            if (demo.Customers == null) return false;
+
+            demo.Customers.Remove(cust);
+
+            await _context.SaveChangesAsync();
+
+            return true;
         }
     }
 }
