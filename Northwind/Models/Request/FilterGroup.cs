@@ -1,10 +1,9 @@
-﻿using Northwind.Models.Abstractions;
-using Northwind.Models.Enums;
+﻿using Northwind.Models.Enums;
+using Northwind.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 
 namespace Northwind.Models.Request
 {
@@ -14,102 +13,31 @@ namespace Northwind.Models.Request
         public IEnumerable<Filter> Filters { get; set; }
         public IEnumerable<FilterGroup> Groups { get; set; }
 
-        public Expression<Func<T, bool>> GetExpression<T>() where T : IExpAccess<T>
+        public Expression<Func<T, bool>> GetExpression<T>()
         {
             Expression<Func<T, bool>> res = null;
             var filterExpressions = new List<Expression<Func<T, bool>>>();
-            var properties = typeof(T).GetProperties();
 
-            foreach(var filter in Filters)
+            foreach (var filter in Filters)
             {
-                var property = properties.FirstOrDefault(x => x.Name == filter.Property);
+                var info = PropertyAccessor<T>.GetPropertyInfo(filter.Property);
 
-                if (property == null) continue;
+                var type = info.PropertyType;
 
-                var type = property.PropertyType;
+                Expression<Func<T, bool>> expr = SelectExpression<T>(type, filter);
 
-                var op = filter.Operator;
-
-                Expression<Func<T, bool>> expr = null;
-
-                T obj = (T)typeof(T).GetMethod("GetInstance").Invoke(null, null);
-
-                switch (type.Name) {
-                    case nameof(String):
-                        {
-                            string value = filter.Value;
-                            Expression<Func<string, bool>> stringFilterExp = (value, op) switch
-                            {
-                                ("" or null, _) => (x => true),
-                                (_, FilterOperator.Contains) => x => x.Contains(value),
-                                (_, _) => (x => false)
-                            };                            
-                            expr = Exp.Compose(obj.GetStringPropertyExp(property.Name), stringFilterExp);
-                        }
-                        break;
-                    case nameof(Int32):
-                        {
-                            int value = int.Parse(filter.Value);
-                            Expression<Func<int, bool>> intFilterExp = (value, op) switch
-                            {
-                                (_, FilterOperator.Equal) => x => x == value,
-                                (_, FilterOperator.LesserThen) => x => x < value,
-                                (_, FilterOperator.GreaterThen) => x => x > value,
-                                (_, _) => x => true
-                            };
-                            expr = Exp.Compose(obj.GetIntPropertyExp(property.Name), intFilterExp);
-                        }
-                        break;
-                    case nameof(Decimal):
-                        {
-                            decimal value = decimal.Parse(filter.Value);
-                            Expression<Func<decimal, bool>> intFilterExp = (value, op) switch
-                            {
-                                (_, FilterOperator.Equal) => x => x == value,
-                                (_, FilterOperator.LesserThen) => x => x < value,
-                                (_, FilterOperator.GreaterThen) => x => x > value,
-                                (_, _) => x => true
-                            };
-                            expr = Exp.Compose((T t) => (decimal)property.GetValue(t), intFilterExp);
-                        }
-                        break;
-                    case nameof(DateTime):
-                        {
-                            DateTime value = DateTime.Parse(filter.Value);
-                            Expression<Func<DateTime, bool>> intFilterExp = (value, op) switch
-                            {
-                                (_, FilterOperator.Equal) => x => x == value,
-                                (_, FilterOperator.LesserThen) => x => x < value,
-                                (_, FilterOperator.GreaterThen) => x => x > value,
-                                (_, _) => x => true
-                            };
-                            expr = Exp.Compose((T t) => (DateTime)property.GetValue(t), intFilterExp);
-
-                        }
-                        break;
-                    case nameof(Boolean):
-                        {
-                            bool value = bool.Parse(filter.Value);
-                            Expression<Func<bool, bool>> intFilterExp = (value, op) switch
-                            {
-                                (_, FilterOperator.Equal) => x => x == value,
-                                (_, _) => x => true
-                            };
-                            expr = Exp.Compose((T t) => (bool)property.GetValue(t), intFilterExp);
-                        }
-                        break;
-                }
-
-                if(expr != null)
+                if (expr != null)
                     filterExpressions.Add(expr);
             }
 
-            switch(Operator)
+            switch (Operator)
             {
                 case FilterGroupOperator.And:
                     {
                         foreach (var exp in filterExpressions)
                             res = Exp.And(res, exp);
+
+                        if (Groups == null) break;
 
                         foreach (var groupExp in Groups)
                         {
@@ -122,6 +50,8 @@ namespace Northwind.Models.Request
                     {
                         foreach (var exp in filterExpressions)
                             res = Exp.Or(res, exp);
+
+                        if (Groups == null) break;
 
                         foreach (var groupExp in Groups)
                         {
@@ -137,6 +67,8 @@ namespace Northwind.Models.Request
                             res = Exp.Not(fexp);
                         }
 
+                        if (Groups == null) break;
+
                         if (Groups.Count() > 0)
                         {
                             var gexp = Groups.First().GetExpression<T>();
@@ -144,13 +76,224 @@ namespace Northwind.Models.Request
                         }
                     }
                     break;
-            }            
+            }
 
             while (res.CanReduce)
                 res.Reduce();
 
             return res;
-        }        
+        }
+
+        private Expression<Func<T, bool>> SelectExpression<T>(Type type, Filter filter)
+        {
+            Expression<Func<T, bool>> expr = null;
+
+            var propertyAccessor = PropertyAccessor<T>.GetPropertyExpression(filter.Property);
+
+            var op = filter.Operator;
+
+            switch (type.Name)
+            {
+                case nameof(String):
+                    {
+                        string value = filter.Value;
+                        Expression<Func<string, bool>> stringFilterExp = (value, op) switch
+                        {
+                            ("" or null, _) => (x => true),
+                            (_, FilterOperator.Contains) => x => x.Contains(value),
+                            (_, _) => (x => false)
+                        };
+                        expr = Exp.Compose(propertyAccessor as Expression<Func<T, string>>, stringFilterExp);
+                    }
+                    break;
+                case nameof(Int32):
+                    {
+                        int value = int.Parse(filter.Value);
+                        Expression<Func<int, bool>> intFilterExp = (value, op) switch
+                        {
+                            (_, FilterOperator.Equal) => x => x == value,
+                            (_, FilterOperator.LesserThen) => x => x < value,
+                            (_, FilterOperator.GreaterThen) => x => x > value,
+                            (_, _) => x => true
+                        };
+                        expr = Exp.Compose(propertyAccessor as Expression<Func<T, int>>, intFilterExp);
+                    }
+                    break;
+                case nameof(Decimal):
+                    {
+                        decimal value = decimal.Parse(filter.Value);
+                        Expression<Func<decimal, bool>> intFilterExp = (value, op) switch
+                        {
+                            (_, FilterOperator.Equal) => x => x == value,
+                            (_, FilterOperator.LesserThen) => x => x < value,
+                            (_, FilterOperator.GreaterThen) => x => x > value,
+                            (_, _) => x => true
+                        };
+                        expr = Exp.Compose(propertyAccessor as Expression<Func<T, decimal>>, intFilterExp);
+                    }
+                    break;
+                case nameof(DateTime):
+                    {
+                        DateTime value = DateTime.Parse(filter.Value);
+                        Expression<Func<DateTime, bool>> intFilterExp = (value, op) switch
+                        {
+                            (_, FilterOperator.Equal) => x => x == value,
+                            (_, FilterOperator.LesserThen) => x => x < value,
+                            (_, FilterOperator.GreaterThen) => x => x > value,
+                            (_, _) => x => true
+                        };
+                        expr = Exp.Compose(propertyAccessor as Expression<Func<T, DateTime>>, intFilterExp);
+
+                    }
+                    break;
+                case nameof(Nullable<DateTime>):
+                    {
+                        DateTime? value = null;
+                        DateTime temp;
+                        if (DateTime.TryParse(filter.Value, out temp)) value = temp;
+                        Expression<Func<DateTime?, bool>> intFilterExp = (value, op) switch
+                        {
+                            (_, FilterOperator.Equal) => x => x == value,
+                            (_, FilterOperator.LesserThen) => x => x < value,
+                            (_, FilterOperator.GreaterThen) => x => x > value,
+                            (_, _) => x => true
+                        };
+                        expr = Exp.Compose(propertyAccessor as Expression<Func<T, DateTime?>>, intFilterExp);
+
+                    }
+                    break;
+                case nameof(Boolean):
+                    {
+                        bool value = bool.Parse(filter.Value);
+                        Expression<Func<bool, bool>> intFilterExp = (value, op) switch
+                        {
+                            (_, FilterOperator.Equal) => x => x == value,
+                            (_, _) => x => true
+                        };
+                        expr = Exp.Compose(propertyAccessor as Expression<Func<T, bool>>, intFilterExp);
+                    }
+                    break;
+            }
+
+            if (expr == null)
+            {
+                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                {
+                    var genType = type.GenericTypeArguments[0];
+                    expr = SelectNullableExpression<T>(genType, filter);
+                }
+            }
+
+            return expr;
+        }
+
+        private Expression<Func<T, bool>> SelectNullableExpression<T>(Type type, Filter filter)
+        {
+            Expression<Func<T, bool>> expr = null;
+
+            var propertyAccessor = PropertyAccessor<T>.GetPropertyExpression(filter.Property);
+
+            var op = filter.Operator;
+
+            switch (type.Name)
+            {
+                case nameof(String):
+                    {
+                        string value = filter.Value;
+                        Expression<Func<string, bool>> stringFilterExp = (value, op) switch
+                        {
+                            ("", _) => (x => true),
+                            (_, FilterOperator.Contains) => x => x.Contains(value),
+                            (_, _) => (x => false)
+                        };
+                        expr = Exp.Compose(Exp.Cast<Func<T, string>>(propertyAccessor), stringFilterExp);
+                    }
+                    break;
+                case nameof(Int32):
+                    {
+                        int? value = null;
+                        if (int.TryParse(filter.Value, out int temp)) {
+                            value = temp;
+                        }
+                        else
+                        {
+                            if (filter.Value == "" || filter.Value == null) value = null;
+                            else throw new Exception("Invalid filter value");
+                        }
+                        Expression<Func<int?, bool>> intFilterExp = (value, op) switch
+                        {
+                            (_, FilterOperator.Equal) => x => x == value,
+                            (_, FilterOperator.LesserThen) => x => x < value,
+                            (_, FilterOperator.GreaterThen) => x => x > value,
+                            (_, _) => x => true
+                        };
+                        expr = Exp.Compose(Exp.Cast<Func<T, int?>>(propertyAccessor), intFilterExp);
+                    }
+                    break;
+                case nameof(Decimal):
+                    {
+                        decimal? value = null;
+                        if (decimal.TryParse(filter.Value, out decimal temp)) {
+                            value = temp;
+                        }
+                        else
+                        {
+                            if (filter.Value == "" || filter.Value == null) value = null;
+                            else throw new Exception("Invalid filter value");
+                        }
+                        Expression<Func<decimal?, bool>> intFilterExp = (value, op) switch
+                        {
+                            (_, FilterOperator.Equal) => x => x == value,
+                            (_, FilterOperator.LesserThen) => x => x < value,
+                            (_, FilterOperator.GreaterThen) => x => x > value,
+                            (_, _) => x => true
+                        };
+                        expr = Exp.Compose(Exp.Cast<Func<T, decimal?>>(propertyAccessor), intFilterExp);
+                    }
+                    break;
+                case nameof(DateTime):
+                    {
+                        DateTime? value = null;
+                        if (DateTime.TryParse(filter.Value, out DateTime temp)) {
+                            value = temp;
+                        } else {
+                            if (filter.Value == "" || filter.Value == null) value = null;
+                            else throw new Exception("Invalid filter value");
+                        }
+                        Expression<Func<DateTime?, bool>> intFilterExp = (value, op) switch
+                        {
+                            (_, FilterOperator.Equal) => x => x == value,
+                            (_, FilterOperator.LesserThen) => x => x < value,
+                            (_, FilterOperator.GreaterThen) => x => x > value,
+                            (_, _) => x => true
+                        };
+                        expr = Exp.Compose(Exp.Cast<Func<T, DateTime?>>(propertyAccessor), intFilterExp);
+
+                    }
+                    break;
+                case nameof(Boolean):
+                    {
+
+                        bool? value = null;
+                        if(bool.TryParse(filter.Value, out bool temp)) {
+                            value = temp;
+                        } else {
+                            if (filter.Value == "" || filter.Value == null) value = null;
+                            else throw new Exception("Invalid filter value");
+                        }
+
+                        Expression<Func<bool?, bool>> intFilterExp = (value, op) switch
+                        {
+                            (_, FilterOperator.Equal) => x => x == value,
+                            (_, _) => x => true
+                        };
+                        expr = Exp.Compose(Exp.Cast<Func<T, bool?>>(propertyAccessor), intFilterExp);
+                    }
+                    break;
+            }
+
+            return expr;
+        }
     }
 
     public static class Exp
@@ -224,6 +367,11 @@ namespace Northwind.Models.Request
         {
             return Expression.Lambda<Func<T, bool>>
                   (Expression.Not(expr1.Body), expr1.Parameters);
+        }
+
+        public static Expression<TResult> Cast<TResult>(LambdaExpression exp)
+        {
+            return (Expression<TResult>)Expression.Lambda(exp.Body, exp.Parameters);
         }
     }
 }

@@ -27,7 +27,7 @@ namespace Northwind.Services
         
         public async Task<IEnumerable<OrderListView>> GetOrdersListViewForEmployee(int employeeId)
         {
-            var listBase = await _context.GetEntities(_context.GetDbSet<Order>(), new GetQueryOptions<Order, OrderListViewBase>()
+            var listBase = await _context.GetEntities(new GetQueryOptions<Order, OrderListViewBase>()
             {
                 Filter = (Order o) => o.EmployeeId == employeeId,
                 Includes = (IQueryable<Order> q) => q.Include(o => o.OrderDetails),
@@ -37,7 +37,7 @@ namespace Northwind.Services
                     OrderDate = o.OrderDate,
                     RequiredDate = o.RequiredDate,
                     ShippedDate = o.ShippedDate,
-                    Total = o.OrderDetails.Sum(od => od.Quantity * od.UnitPrice)                    
+                    Total = Convert.ToDouble(o.OrderDetails.Sum(od => od.Quantity * od.UnitPrice))                   
                 })
             });
 
@@ -63,7 +63,7 @@ namespace Northwind.Services
 
         public async Task<IEnumerable<OrderListView>> GetOrdersListViewForCustomer(string customerId)
         {
-            var listBase = await _context.GetEntities(_context.GetDbSet<Order>(), new GetQueryOptions<Order, OrderListViewBase>()
+            var listBase = await _context.GetEntities(new GetQueryOptions<Order, OrderListViewBase>()
             {
                 Filter = (Order o) => o.CustomerId == customerId,
                 Includes = (IQueryable<Order> q) => q.Include(o => o.OrderDetails),
@@ -73,7 +73,7 @@ namespace Northwind.Services
                     OrderDate = o.OrderDate,
                     RequiredDate = o.RequiredDate,
                     ShippedDate = o.ShippedDate,
-                    Total = o.OrderDetails.Sum(od => od.Quantity * od.UnitPrice)
+                    Total = Convert.ToDouble(o.OrderDetails.Sum(od => od.Quantity * od.UnitPrice))
                 })
             });
 
@@ -99,7 +99,7 @@ namespace Northwind.Services
 
         public async Task<IEnumerable<OrderListView>> GetOrdersListViewForShipper(int shipperId)
         {
-            var listBase = await _context.GetEntities(_context.GetDbSet<Order>(), new GetQueryOptions<Order, OrderListViewBase>()
+            var listBase = await _context.GetEntities(new GetQueryOptions<Order, OrderListViewBase>()
             {
                 Filter = (Order o) => o.ShipViaId == shipperId,
                 Includes = (IQueryable<Order> q) => q.Include(o => o.OrderDetails),
@@ -109,7 +109,7 @@ namespace Northwind.Services
                     OrderDate = o.OrderDate,
                     RequiredDate = o.RequiredDate,
                     ShippedDate = o.ShippedDate,
-                    Total = o.OrderDetails.Sum(od => od.Quantity * od.UnitPrice)
+                    Total = Convert.ToDouble(o.OrderDetails.Sum(od => od.Quantity * od.UnitPrice))
                 })
             });
 
@@ -135,7 +135,7 @@ namespace Northwind.Services
 
         public async Task<IEnumerable<OrderListView>> GetOrdersListViewForProduct(int productId)
         {
-            var listBase = await _context.GetEntities(_context.GetDbSet<Product>(), new GetQueryOptions<Product, OrderListViewBase>()
+            var listBase = await _context.GetEntities(new GetQueryOptions<Product, OrderListViewBase>()
             {
                 Filter = (Product o) => o.Id == productId,
                 Count = 1,
@@ -149,7 +149,7 @@ namespace Northwind.Services
                         OrderDate = o.OrderDate,
                         RequiredDate = o.RequiredDate,
                         ShippedDate = o.ShippedDate,
-                        Total = o.OrderDetails.Sum(od => od.Quantity * od.UnitPrice)
+                        Total = Convert.ToDouble(o.OrderDetails.Sum(od => od.Quantity * od.UnitPrice))
                     })
             });
 
@@ -173,21 +173,9 @@ namespace Northwind.Services
             return result;
         }
 
-        public async Task<Order> GetOrderWithDetailsAndProducts(int orderId)
-        {
-            var result = await _context.GetEntity(_context.GetDbSet<Order>(), new GetQueryOptions<Order>()
-            {
-                Filter = (Order o) => o.Id == orderId,
-                Includes = (IQueryable<Order> q) => 
-                    q.Include(o => o.OrderDetails).ThenInclude(od => od.Product)
-            });
-
-            return result;
-        }
-
         public async Task<IEnumerable<OrderListView>> GetOrdersListView()
         {
-            var listBase = await _context.GetEntities(_context.GetDbSet<Order>(), new GetQueryOptions<Order, OrderListViewBase>()
+            var listBase = await _context.GetEntities(new GetQueryOptions<Order, OrderListViewBase>()
             {
                 Includes = (IQueryable<Order> q) => q.Include(o => o.OrderDetails).ThenInclude(od => od.Product),
                 Select = (IQueryable<Order> q) => q.Select(o => new OrderListViewBase()
@@ -196,7 +184,7 @@ namespace Northwind.Services
                     OrderDate = o.OrderDate,
                     RequiredDate = o.RequiredDate,
                     ShippedDate = o.ShippedDate,
-                    Total = o.OrderDetails.Sum(od => od.UnitPrice * od.Quantity)
+                    Total = Convert.ToDouble(o.OrderDetails.Sum(od => od.UnitPrice * od.Quantity))
                 }),
             });
 
@@ -221,20 +209,20 @@ namespace Northwind.Services
 
         public async Task<IEnumerable<OrderListView>> GetFilteredOrdersListView(GetRequest req)
         {
-            var listBase = await _context.GetEntities(_context.GetDbSet<Order>(), new GetQueryOptions<Order, OrderListViewBase>()
+            var listBase = await _context.GetEntities(new GetQueryOptions<Order, OrderListViewBase>()
             {
                 Includes = (IQueryable<Order> q) => q.Include(o => o.OrderDetails).ThenInclude(od => od.Product),
                 Skip = req.ItemsPerPage * req.Page,
                 Count = req.ItemsPerPage,
-                Sort = req.Sorting.GetSortExpressions<Order>(),
-                Filter = req.Filters.GetExpression<Order>(),
+                Sort = req.Sorting?.GetSortExpressions<Order>(),
+                Filter = req.Filters?.GetExpression<Order>(),
                 Select = (IQueryable<Order> q) => q.Select(o => new OrderListViewBase()
                 {
                     Id = o.Id,
                     OrderDate = o.OrderDate,
                     RequiredDate = o.RequiredDate,
                     ShippedDate = o.ShippedDate,
-                    Total = o.OrderDetails.Sum(od => od.UnitPrice * od.Quantity)
+                    Total = Convert.ToDouble(o.OrderDetails.Sum(od => od.UnitPrice * od.Quantity))
                 }),
             });
 
@@ -257,6 +245,25 @@ namespace Northwind.Services
             return result;
         }
 
+        public async Task<int> GetFilteredOrdersListViewCount(GetRequest req)
+        {
+            var result = await _context.GetCount(new GetQueryOptions<Order, OrderListViewBase>()
+            {
+                Includes = (IQueryable<Order> q) => q.Include(o => o.OrderDetails).ThenInclude(od => od.Product),
+                Filter = req.Filters?.GetExpression<Order>(),
+                Select = (IQueryable<Order> q) => q.Select(o => new OrderListViewBase()
+                {
+                    Id = o.Id,
+                    OrderDate = o.OrderDate,
+                    RequiredDate = o.RequiredDate,
+                    ShippedDate = o.ShippedDate,
+                    Total = Convert.ToDouble(o.OrderDetails.Sum(od => od.UnitPrice * od.Quantity))
+                }),
+            });
+
+            return result;
+        }
+
         public async Task<Order> CreateOrder(CreateOrderRequest req)
         {
             var order = _mapper.Map<CreateOrderRequest, Order>(req);
@@ -265,7 +272,7 @@ namespace Northwind.Services
 
             var productIds = order.OrderDetails.Select(d => d.OrderId);
 
-            var products = await _context.GetEntities(_context.GetDbSet<Product>(), productIds);
+            var products = await _context.GetEntities<Product, int>(productIds);
 
             foreach (var product in products)
             {
@@ -278,7 +285,7 @@ namespace Northwind.Services
                 product.UnitsOnOrder += orderCount;
             }
 
-            order = _context.CreateEntity(_context.GetDbSet<Order>(), order);
+            order = _context.CreateEntity(order);
 
             await _context.SaveChangesAsync();
 
@@ -287,7 +294,7 @@ namespace Northwind.Services
 
         public async Task<bool> RemoveOrder(int orderId)
         {
-            var order = await _context.GetEntity(_context.GetDbSet<Order>(), new GetSingleQueryOptions<Order>() { 
+            var order = await _context.GetEntity(new GetSingleQueryOptions<Order>() { 
                 Filter = (Order o) => o.Id == orderId,
                 Includes = (IQueryable<Order> q) => q.Include(o => o.OrderDetails).ThenInclude(od => od.Product)
             });
@@ -305,7 +312,7 @@ namespace Northwind.Services
                 }
             }
 
-            var result = _context.DeleteEntity(_context.GetDbSet<Order>(), order);
+            var result = _context.DeleteEntity(order);
 
             await _context.SaveChangesAsync();
 

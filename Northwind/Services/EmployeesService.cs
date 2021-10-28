@@ -21,7 +21,7 @@ namespace Northwind.Services
 
         public async Task<IEnumerable<Employee>> GetEmployeesForTerritory(int territoryId)
         {
-            var demo = await _context.GetEntity<Territory>(_context.GetDbSet<Territory>(), new GetSingleQueryOptions<Territory>()
+            var demo = await _context.GetEntity<Territory>(new GetSingleQueryOptions<Territory>()
             {
                 Filter = (Territory d) => d.Id == territoryId,
                 Includes = (IQueryable<Territory> q) => 
@@ -38,7 +38,7 @@ namespace Northwind.Services
 
         public async Task<IEnumerable<EmployeeListView>> GetEmployeesListView()
         {
-            var employees = await _context.GetEntities(_context.GetDbSet<Employee>(), new GetQueryOptions<Employee, EmployeeListView>()
+            var employees = await _context.GetEntities(new GetQueryOptions<Employee, EmployeeListView>()
             {
                 Select = (IQueryable<Employee> q) => q.Select(e => new EmployeeListView()
                 {
@@ -54,13 +54,13 @@ namespace Northwind.Services
 
         public async Task<bool> AddTerritoryToEmployee(int employeeId, int territoryId)
         {
-            var empl = await _context.GetEntity(_context.GetDbSet<Employee>(), new GetSingleQueryOptions<Employee>()
+            var empl = await _context.GetEntity(new GetSingleQueryOptions<Employee>()
             {
                 Filter = (Employee e) => e.Id == employeeId,
                 Includes = (IQueryable<Employee> q) => q.Include((Employee e) => e.Territories)
             });
 
-            var terr = await _context.GetEntity(_context.GetDbSet<Territory>(), territoryId);
+            var terr = await _context.GetEntity<Territory, int>(territoryId);
 
             if (empl == null || terr == null) return false;
 
@@ -76,13 +76,13 @@ namespace Northwind.Services
 
         public async Task<bool> RemoveTerritoryFromEmployee(int employeeId, int territoryId)
         {
-            var empl = await _context.GetEntity(_context.GetDbSet<Employee>(), new GetSingleQueryOptions<Employee>()
+            var empl = await _context.GetEntity(new GetSingleQueryOptions<Employee>()
             {
                 Filter = (Employee e) => e.Id == employeeId,
                 Includes = (IQueryable<Employee> q) => q.Include((Employee e) => e.Territories)
             });
 
-            var terr = await _context.GetEntity(_context.GetDbSet<Territory>(), territoryId);
+            var terr = await _context.GetEntity<Territory, int>(territoryId);
 
             if (empl == null || terr == null) return false;
 

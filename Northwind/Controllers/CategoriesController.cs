@@ -127,7 +127,7 @@ namespace Northwind.Controllers
                 Count = request.ItemsPerPage,
                 Skip = request.ItemsPerPage * (request.Page - 1),
                 Filter = request.Filters?.GetExpression<Category>(),
-                Sort = request.Sorting.GetSortExpressions<Category>()
+                Sort = request.Sorting?.GetSortExpressions<Category>()
             }); ;
 
             return Ok(_mapper.Map<IEnumerable<CategoryView>>(result));

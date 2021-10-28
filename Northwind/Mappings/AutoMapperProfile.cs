@@ -73,6 +73,7 @@ namespace Northwind.Mappings
             CreateMap<UpdateOrderDetailsRequest, OrderDetails>();
             CreateMap<OrderDetails, OrderDetailsListView>();
             CreateMap<OrderDetails, OrderDetailsView>();
+            CreateMap<OrderListViewBase, OrderListView>();
         }
     }
 }

@@ -20,7 +20,7 @@ namespace Northwind.Services
 
         public async Task<IEnumerable<Product>> GetProductsForSupplier(int supplierId)
         {
-            var result = await _context.GetEntities(_context.GetDbSet<Product>(),
+            var result = await _context.GetEntities(
                 new GetQueryOptions<Product>()
                 {
                     Filter = (Product x) => x.SupplierId == supplierId
@@ -31,7 +31,7 @@ namespace Northwind.Services
 
         public async Task<IEnumerable<ProductListView>> GetProductsListViewForSupplier(int supplierId)
         {
-            var result = await _context.GetEntities(_context.GetDbSet<Product>(),
+            var result = await _context.GetEntities(
                 new GetQueryOptions<Product, ProductListView>()
                 {
                     Filter = (Product x) => x.SupplierId == supplierId,
@@ -50,7 +50,7 @@ namespace Northwind.Services
 
         public async Task<IEnumerable<Product>> GetProductsForCategory(int categoryId)
         {
-            var result = await _context.GetEntities(_context.GetDbSet<Product>(),
+            var result = await _context.GetEntities(
                 new GetQueryOptions<Product>() {
                     Filter = (Product x) => x.CategoryId == categoryId
                 });
@@ -60,7 +60,7 @@ namespace Northwind.Services
 
         public async Task<IEnumerable<ProductListView>> GetProductsListViewForCategory(int categoryId)
         {
-            var result = await _context.GetEntities(_context.GetDbSet<Product>(),
+            var result = await _context.GetEntities(
                 new GetQueryOptions<Product, ProductListView>()
                 {
                     Filter = (Product x) => x.CategoryId == categoryId,
@@ -79,7 +79,7 @@ namespace Northwind.Services
 
         public async Task<IEnumerable<Product>> GetProductsForOrder(int orderId)
         {
-            var result = await _context.GetEntities(_context.GetDbSet<Order>(), new GetQueryOptions<Order, Product>()
+            var result = await _context.GetEntities(new GetQueryOptions<Order, Product>()
             {
                 Filter = (Order o) => o.Id == orderId,
                 Count = 1,

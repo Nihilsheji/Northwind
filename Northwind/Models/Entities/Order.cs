@@ -1,14 +1,39 @@
-﻿using Northwind.Models.Abstractions;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
+using System.Reflection;
 
 namespace Northwind.Models.Entities
 {
-    public class Order : IExpAccess<Order>
+    public class Order
     {
+        public static Dictionary<string, LambdaExpression> PropDictionary { get; }
+            = new Dictionary<string, LambdaExpression>()
+            {
+                { "orderDate", (Expression<Func<Order, DateTime?>>)((Order o) => o.OrderDate) },
+                { "requiredDate", (Expression<Func<Order, DateTime?>>)((Order o) => o.RequiredDate) },
+                { "shippedDate", (Expression<Func<Order, DateTime?>>)((Order o) => o.ShippedDate) },
+                { "shipName", (Expression<Func<Order, string>>)((Order o) => o.ShipName) },
+                { "shipAddress", (Expression<Func<Order, string>>)((Order o) => o.ShipAddress) },
+                { "shipCity", (Expression<Func<Order, string>>)((Order o) => o.ShipRegion) },
+                { "shipPostaCode", (Expression<Func<Order, string>>)((Order o) => o.ShipPostalCode) },
+                { "shipCountry", (Expression<Func<Order, string>>)((Order o) => o.ShipCountry) }
+            };
+
+        public static Dictionary<string, PropertyInfo> PropInfoDictionary { get; set; }
+            = new Dictionary<string, PropertyInfo>()
+            {
+                { "orderDate", typeof(Order).GetProperty("OrderDate") },
+                { "requiredDate", typeof(Order).GetProperty("RequiredDate") },
+                { "shippedDate", typeof(Order).GetProperty("ShippedDate") },
+                { "shipName", typeof(Order).GetProperty("ShipName") },
+                { "shipAddress", typeof(Order).GetProperty("ShipAddress") },
+                { "shipCity", typeof(Order).GetProperty("ShipCity") },
+                { "shipPostaCode", typeof(Order).GetProperty("ShipPostalCode") },
+                { "shipCountry", typeof(Order).GetProperty("ShipCountry") }
+            };
+
+
         public int Id { get; set; }
         public string CustomerId { get; set; }
         public int EmployeeId { get; set; }
@@ -16,7 +41,7 @@ namespace Northwind.Models.Entities
         public DateTime? RequiredDate { get; set; }
         public DateTime? ShippedDate { get; set; }
         public int ShipViaId { get; set; }
-        public float Freight { get; set; }
+        public decimal Freight { get; set; }
         public string ShipName { get; set; }
         public string ShipAddress { get; set; }
         public string ShipCity { get; set; }
@@ -29,69 +54,5 @@ namespace Northwind.Models.Entities
         public Employee Employee { get; set; }
         public Shipper ShipVia { get; set; }
         public IEnumerable<OrderDetails> OrderDetails { get; set; }
-
-        public Expression<Func<Order, int>> GetIntPropertyExp(string propName)
-        {
-            Expression<Func<Order, int>> res = (propName) switch
-            {
-                "id" => (Order o) => o.Id,
-                "employeeId" => (Order o) => o.EmployeeId,
-                "shipViaId" => (Order o) => o.ShipViaId,
-                _ => null
-            };
-
-            return res;
-        }
-
-        public Expression<Func<Order, float>> GetFloatPropertyExp(string propName)
-        {
-            Expression<Func<Order, float>> res = (propName) switch
-            {
-                "freight" => (Order o) => o.Freight,
-                _ => null
-            };
-
-            return res;
-        }
-
-        public Expression<Func<Order, DateTime?>> GetDateTimePropertyExp(string propName)
-        {
-            Expression<Func<Order, DateTime?>> res = (propName) switch
-            {
-                "orderDate" => (Order o) => o.OrderDate,
-                "requiredDate" => (Order o) => o.RequiredDate,
-                "shippedDate" => (Order o) => o.ShippedDate,
-                _ => null
-            };
-
-            return res;
-        }
-
-        public Expression<Func<Order, string>> GetStringPropertyExp(string propName)
-        {
-            Expression<Func<Order, string>> res = (propName) switch
-            {
-                "customerId" => (Order o) => o.CustomerId,
-                "shipName" => (Order o) => o.ShipName,
-                "shipAddress" => (Order o) => o.ShipAddress,
-                "shipCity" => (Order o) => o.ShipCity,
-                "shipRegion" => (Order o) => o.ShipRegion,
-                "shipPostalCode" => (Order o) => o.ShipPostalCode,
-                "shipCountry" => (Order o) => o.ShipCountry,
-                _ => null
-            };
-
-            return res;
-        }
-
-        public Order MakeEmpty()
-        {
-            return new Order();
-        }
-
-        public static Order GetInstance()
-        {
-            return new Order();
-        }
     }
 }

@@ -20,7 +20,7 @@ namespace Northwind.Services
 
         public async Task<IEnumerable<Demographic>> GetCustomersForDemographic(string demographicId)
         {
-            var demo = await _context.GetEntity<Customer>(_context.GetDbSet<Customer>(), new GetSingleQueryOptions<Customer>()
+            var demo = await _context.GetEntity(new GetSingleQueryOptions<Customer>()
             {
                 Filter = (Customer d) => d.Id == demographicId,
                 Includes = (IQueryable<Customer> q) => 
@@ -37,9 +37,9 @@ namespace Northwind.Services
 
         public async Task<bool> AddCustomerToDemographic(int demographicId, string customerId)
         {
-            var demo = await _context.GetEntity(_context.GetDbSet<Demographic>(), demographicId);
+            var demo = await _context.GetEntity<Demographic, int>(demographicId);
 
-            var cust = await _context.GetEntity(_context.GetDbSet<Customer>(), customerId);
+            var cust = await _context.GetEntity<Customer, string>(customerId);
 
             if (demo == null || cust == null) return false;
 
@@ -55,14 +55,14 @@ namespace Northwind.Services
 
         public async Task<bool> RemoveCustomerFromDemographic(int demographicId, string customerId)
         {
-            var demo = await _context.GetEntity(_context.GetDbSet<Demographic>(), new GetSingleQueryOptions<Demographic>()
+            var demo = await _context.GetEntity(new GetSingleQueryOptions<Demographic>()
             {
                 Filter = (Demographic d) => d.Id == demographicId,
                 Includes = (IQueryable<Demographic> q) =>
                     q.Include(d => d.Customers)
             });
 
-            var cust = await _context.GetEntity(_context.GetDbSet<Customer>(), customerId);
+            var cust = await _context.GetEntity<Customer, string>(customerId);
 
             if (demo == null || cust == null) return false;
 

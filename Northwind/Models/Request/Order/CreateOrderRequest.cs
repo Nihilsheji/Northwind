@@ -12,7 +12,7 @@ namespace Northwind.Models.Request.Order
         public int EmployeeId { get; set; }
         public DateTime? RequiredDate { get; set; }
         public int ShipViaId { get; set; }
-        public float Freight { get; set; }
+        public decimal Freight { get; set; }
         public string ShipName { get; set; }
         public string ShipAddress { get; set; }
         public string ShipCity { get; set; }

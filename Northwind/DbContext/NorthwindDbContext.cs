@@ -12,11 +12,33 @@ namespace Northwind.DbContexts
 {
     public class NorthwindDbContext : DbContext, INorthwindDbContext
     {
-        public NorthwindDbContext(DbContextOptions<NorthwindDbContext> options): base(options) {}
+        public NorthwindDbContext(DbContextOptions<NorthwindDbContext> options) : base(options) { 
+        
+        }
+
+        static NorthwindDbContext()
+        {
+            var props = typeof(NorthwindDbContext).GetProperties();
+
+            foreach(var p in props)
+            {
+                var type = p.PropertyType;
+                var dbSetType = typeof(DbSet<>);
+
+                if(type.IsGenericType && type.GetGenericTypeDefinition() == dbSetType)
+                {
+                    var genericArg = type.GetGenericArguments()[0];
+                    SetDictionary.Add(genericArg, p);
+                }
+            }
+        }
+
+        private static Dictionary<Type, PropertyInfo> SetDictionary { get; set; } = new Dictionary<Type, PropertyInfo>();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<Category>(e => {
+            builder.Entity<Category>(e =>
+            {
                 e.HasKey(e => e.Id);
 
                 e.Property(e => e.Id).HasColumnName("CategoryID");
@@ -24,10 +46,11 @@ namespace Northwind.DbContexts
                 e.Property(e => e.Description).HasColumnType("text");
                 e.Property(e => e.Picture).HasColumnType("varchar(40)");
 
-                e.HasMany(x => x.Products).WithOne(x => x.Category);                
+                e.HasMany(x => x.Products).WithOne(x => x.Category);
             });
 
-            builder.Entity<Customer>(e => {
+            builder.Entity<Customer>(e =>
+            {
                 e.HasKey(e => e.Id);
 
                 e.Property(e => e.Id).HasColumnName("CustomerID").HasColumnType("varchar(5)");
@@ -46,7 +69,8 @@ namespace Northwind.DbContexts
                 e.HasMany(x => x.Demographics).WithMany(x => x.Customers);
             });
 
-            builder.Entity<Demographic>(e => {
+            builder.Entity<Demographic>(e =>
+            {
                 e.HasKey(x => x.Id);
 
                 e.Property(x => x.Id).HasColumnName("CustomerTypeID");
@@ -54,7 +78,8 @@ namespace Northwind.DbContexts
                 e.HasMany(x => x.Customers).WithMany(x => x.Demographics);
             });
 
-            builder.Entity<Employee>(e => {
+            builder.Entity<Employee>(e =>
+            {
                 e.HasKey(x => x.Id);
 
                 e.Property(x => x.Id).HasColumnName("EmployeeID");
@@ -78,7 +103,8 @@ namespace Northwind.DbContexts
                 e.HasMany(x => x.Orders).WithOne(x => x.Employee);
             });
 
-            builder.Entity<Order>(e => {
+            builder.Entity<Order>(e =>
+            {
                 e.HasKey(x => x.Id);
 
                 e.Property(x => x.Id).HasColumnName("OrderID");
@@ -100,7 +126,8 @@ namespace Northwind.DbContexts
                 e.HasMany(x => x.OrderDetails).WithOne(x => x.Order).OnDelete(DeleteBehavior.Cascade);
             });
 
-            builder.Entity<OrderDetails>(e => {
+            builder.Entity<OrderDetails>(e =>
+            {
                 e.HasKey(x => x.Id);
 
                 e.Property(x => x.Id).HasColumnName("odID");
@@ -115,7 +142,8 @@ namespace Northwind.DbContexts
                 e.HasOne(x => x.Product).WithMany(x => x.OrderDetails).HasForeignKey(x => x.ProductId);
             });
 
-            builder.Entity<Product>(e => {
+            builder.Entity<Product>(e =>
+            {
                 e.HasKey(x => x.Id);
 
                 e.Property(x => x.Id).HasColumnName("ProductID");
@@ -134,7 +162,8 @@ namespace Northwind.DbContexts
                 e.HasMany(x => x.OrderDetails).WithOne(x => x.Product);
             });
 
-            builder.Entity<Region>(e => {
+            builder.Entity<Region>(e =>
+            {
                 e.HasKey(x => x.Id);
 
                 e.Property(x => x.Id).HasColumnName("RegionID");
@@ -142,7 +171,8 @@ namespace Northwind.DbContexts
                 e.HasMany(x => x.Territories).WithOne(x => x.Region).OnDelete(DeleteBehavior.Cascade);
             });
 
-            builder.Entity<Shipper>(e => {
+            builder.Entity<Shipper>(e =>
+            {
                 e.HasKey(x => x.Id);
 
                 e.Property(x => x.Id).HasColumnName("ShipperID");
@@ -152,7 +182,8 @@ namespace Northwind.DbContexts
                 e.HasMany(x => x.Orders).WithOne(x => x.ShipVia);
             });
 
-            builder.Entity<Supplier>(e => {
+            builder.Entity<Supplier>(e =>
+            {
                 e.HasKey(x => x.Id);
 
                 e.Property(x => x.Id).HasColumnName("SupplierID");
@@ -171,7 +202,8 @@ namespace Northwind.DbContexts
                 e.HasMany(x => x.Products).WithOne(x => x.Supplier);
             });
 
-            builder.Entity<Territory>(e => {
+            builder.Entity<Territory>(e =>
+            {
                 e.HasKey(x => x.Id);
 
                 e.Property(x => x.Id).HasColumnName("TerritoryID");
@@ -195,13 +227,17 @@ namespace Northwind.DbContexts
         public virtual DbSet<Supplier> Suppliers { get; set; }
         public virtual DbSet<Territory> Territories { get; set; }
 
-        public async Task<int> GetCount<T>(DbSet<T> set) where T : class
+        public async Task<int> GetCount<T>() where T : class
         {
+            var set = GetDbSet<T>();
+
             return await set.CountAsync();
         }
 
-        public async Task<int> GetCount<T>(DbSet<T> set, GetQueryOptions<T> opt) where T : class
+        public async Task<int> GetCount<T>(GetQueryOptions<T> opt) where T : class
         {
+            var set = GetDbSet<T>();
+
             var query = set.AsQueryable<T>();
 
             query = opt.BuildQuery(query);
@@ -209,29 +245,39 @@ namespace Northwind.DbContexts
             return await query.CountAsync();
         }
 
-        public async Task<int> GetCount<T, TResult>(DbSet<T> set, GetQueryOptions<T, TResult> opt) where T : class
+        public async Task<int> GetCount<T, TResult>(GetQueryOptions<T, TResult> opt) where T : class
         {
+            var set = GetDbSet<T>();
+
             var query = set.AsQueryable<T>();
 
-            query = opt.BuildQuery(query);
+            var projectedQuery = opt.BuildQuery(query);
 
-            return await query.CountAsync();
+            return await projectedQuery.CountAsync();
         }
 
-        public async Task<T> GetEntity<T, KeyType> (DbSet<T> set, KeyType id) where T : class
+        public async Task<T> GetEntity<T, KeyType>(KeyType id) where T : class
         {
+            var set = GetDbSet<T>();
+
             return await set.FindAsync(id);
         }
 
-        public async Task<T> GetEntity<T>(DbSet<T> set, GetSingleQueryOptions<T> opt) where T : class {
+        public async Task<T> GetEntity<T>(GetSingleQueryOptions<T> opt) where T : class
+        {
+            var set = GetDbSet<T>();
+
             var query = set.AsQueryable<T>();
-            
+
             query = opt.BuildQuery(query);
 
             return await query.FirstOrDefaultAsync();
         }
-        
-        public async Task<TResult> GetEntity<T, TResult>(DbSet<T> set, GetSingleQueryOptions<T, TResult> opt) where T : class {
+
+        public async Task<TResult> GetEntity<T, TResult>(GetSingleQueryOptions<T, TResult> opt) where T : class
+        {
+            var set = GetDbSet<T>();
+
             var query = set.AsQueryable<T>();
 
             var projectedQuery = opt.BuildQuery(query);
@@ -239,62 +285,84 @@ namespace Northwind.DbContexts
             return await projectedQuery.FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<T>> GetEntities<T>(DbSet<T> set) where T : class
+        public async Task<IEnumerable<T>> GetEntities<T>() where T : class
         {
+            var set = GetDbSet<T>();
+
             return await set.ToListAsync();
         }
 
-        public async Task<IEnumerable<T>> GetEntities<T, KeyType> (DbSet<T> set, IEnumerable<KeyType> ids) where T : class {
+        public async Task<IEnumerable<T>> GetEntities<T, KeyType>(IEnumerable<KeyType> ids) where T : class
+        {
+            var set = GetDbSet<T>();
+
             return await set.ToListAsync();
         }
 
-        public async Task<IEnumerable<T>> GetEntities<T>(DbSet<T> set, GetQueryOptions<T> opt) where T : class
+        public async Task<IEnumerable<T>> GetEntities<T>(GetQueryOptions<T> opt) where T : class
         {
+            var set = GetDbSet<T>();
+
             var query = set.AsQueryable();
 
-            query = BuildQuery(query, opt);
+            query = opt.BuildQuery(query);
 
             return await query.ToListAsync();
         }
 
-        public async Task<IEnumerable<TResult>> GetEntities<T, TResult>(DbSet<T> set, GetQueryOptions<T, TResult> opt) where T : class
+        public async Task<IEnumerable<TResult>> GetEntities<T, TResult>(GetQueryOptions<T, TResult> opt) where T : class
         {
+            var set = GetDbSet<T>();
+
             var query = set.AsQueryable();
 
-            query = BuildQuery(query, opt);
-
-            var projectedQuery = opt.Select(query);
+            var projectedQuery = opt.BuildQuery(query);
 
             return await projectedQuery.ToListAsync();
         }
 
-        public T CreateEntity<T>(DbSet<T> set, T entity) where T: class
+        public T CreateEntity<T>(T entity) where T : class
         {
+            var set = GetDbSet<T>();
+
             var result = set.Add(entity);
+
             return result.Entity;
         }
 
-        public IEnumerable<T> CreateEntities<T>(DbSet<T> set, IEnumerable<T> entities) where T : class
+        public IEnumerable<T> CreateEntities<T>(IEnumerable<T> entities) where T : class
         {
+            var set = GetDbSet<T>();
+
             set.AddRange(entities);
+
             return entities;
         }
 
-        public T UpdateEntity<T>(DbSet<T> set, T entity) where T : class
+        public T UpdateEntity<T>(T entity) where T : class
         {
+            var set = GetDbSet<T>();
+
             var result = set.Update(entity);
+
             return result.Entity;
         }
 
-        public T DeleteEntity<T>(DbSet<T> set, T entity) where T : class
+        public T DeleteEntity<T>(T entity) where T : class
         {
+            var set = GetDbSet<T>();
+
             var result = set.Remove(entity);
+
             return result.Entity;
         }
 
-        public IEnumerable<T> DeleteEntities<T>(DbSet<T> set, IEnumerable<T> entities) where T : class
+        public IEnumerable<T> DeleteEntities<T>(IEnumerable<T> entities) where T : class
         {
+            var set = GetDbSet<T>();
+
             set.RemoveRange(entities);
+
             return entities;
         }
 
@@ -303,233 +371,13 @@ namespace Northwind.DbContexts
             await base.SaveChangesAsync();
         }
 
-        public DbSet<T> GetDbSet<T>() where T : class
+        private DbSet<T> GetDbSet<T>() where T : class
         {
             Type t = typeof(T);
-            if (t == typeof(Category))
-                return Categories as DbSet<T>;
 
-            if (t == typeof(Shipper))
-                return Shippers as DbSet<T>;
-
-            if (t == typeof(Customer))
-                return Customers as DbSet<T>;
-
-            if (t == typeof(Demographic))
-                return Demographics as DbSet<T>;
-
-            if (t == typeof(Employee))
-                return Employees as DbSet<T>;
-
-            if (t == typeof(Order))
-                return Orders as DbSet<T>;
-
-            if (t == typeof(OrderDetails))
-                return OrderDetails as DbSet<T>;
-
-            if (t == typeof(Product))
-                return Products as DbSet<T>;
-
-            if (t == typeof(Region))
-                return Regions as DbSet<T>;
-
-            if (t == typeof(Supplier))
-                return Suppliers as DbSet<T>;
-
-            if (t == typeof(Territory))
-                return Territories as DbSet<T>;
-
-            return null;
+            var set = SetDictionary[t]?.GetValue(this) as DbSet<T> ?? null;
+            
+            return set;           
         }
-
-        private static IQueryable<T> BuildQuery<T>(IQueryable<T> query, GetQueryOptions<T> opt) where T : class
-        {            
-
-            if (opt.Includes != null)
-            {
-                query = opt.Includes(query);
-            }
-
-            if (opt.Filter != null)
-            {
-                query = query.Where(opt.Filter);
-            }
-
-            if (opt.Reverse)
-            {
-                query = query.Reverse();
-            }
-
-            if (opt.Sort != null)
-            {
-                var first = true;
-                foreach(var exp in opt.Sort)
-                {
-                    var type = exp.Type;
-                    var funcType = typeof(Func<,>);
-                    var expression = typeof(Expression<>).MakeGenericType(funcType);
-
-                    var orderBy = typeof(Queryable).GetMethodExt("OrderBy", new[] { typeof(IQueryable<>), expression })
-                        .MakeGenericMethod(typeof(T), type);
-                    var orderByDesc = typeof(Queryable).GetMethodExt("OrderByDescending", new[] { typeof(IQueryable<>), expression })
-                        .MakeGenericMethod(typeof(T), type);
-                    var thenOrderBy = typeof(Queryable).GetMethodExt("ThenBy", new[] { typeof(IOrderedQueryable<>), expression })
-                        .MakeGenericMethod(typeof(T), type);
-                    var thenOrderByDesc = typeof(Queryable).GetMethodExt("ThenByDescending", new[] { typeof(IOrderedQueryable<>), expression })
-                        .MakeGenericMethod(typeof(T), type);
-
-                    if (first && exp.Ascending)
-                    {
-                        query = orderBy.Invoke(null, new object[] { query, exp.Expression }) as IQueryable<T>;
-                        first = false;
-                    } 
-                    else if(first && !exp.Ascending) 
-                    {
-                        query = orderByDesc.Invoke(null, new object[] { query, exp.Expression }) as IQueryable<T>;
-                        first = false;
-                    }
-                    else if (exp.Ascending) 
-                    {
-                        query = thenOrderBy.Invoke(null, new object[] { query, exp.Expression }) as IQueryable<T>;
-                    }
-                    else 
-                    {
-                        query = thenOrderByDesc.Invoke(null, new object[] { query, exp.Expression }) as IQueryable<T>;
-                    }
-                }
-            }
-
-            if (opt.Skip != 0)
-            {
-                query = query.Skip(opt.Skip);
-            }
-
-            if (opt.Count != 0)
-            {
-                query = query.Take(opt.Count);
-            }                        
-
-            return query;
-        }
-    }
-
-    public static class TypeExt
-    {
-        public static MethodInfo GetMethodExt
-        (
-            this Type thisType,
-            string name,
-            params Type[] parameterTypes
-        )
-        {
-            return GetMethodExt(thisType,
-                                name,
-                                BindingFlags.Instance
-                                | BindingFlags.Static
-                                | BindingFlags.Public
-                                | BindingFlags.NonPublic
-                                | BindingFlags.FlattenHierarchy,
-                                parameterTypes);
-        }
-
-        public static MethodInfo GetMethodExt
-        (
-            this Type thisType,
-            string name,
-            BindingFlags bindingFlags,
-            params Type[] parameterTypes
-        )
-        {
-            MethodInfo matchingMethod = null;
-
-            GetMethodExt(ref matchingMethod, thisType, name, bindingFlags, parameterTypes);
-
-            if (matchingMethod == null && thisType.IsInterface)
-            {
-                foreach (Type interfaceType in thisType.GetInterfaces())
-                    GetMethodExt(ref matchingMethod,
-                                 interfaceType,
-                                 name,
-                                 bindingFlags,
-                                 parameterTypes);
-            }
-
-            return matchingMethod;
-        }
-
-        private static void GetMethodExt(ref MethodInfo matchingMethod,
-                                    Type type,
-                                    string name,
-                                    BindingFlags bindingFlags,
-                                    params Type[] parameterTypes)
-        {
-            // Check all methods with the specified name, including in base classes
-            foreach (MethodInfo methodInfo in type.GetMember(name,
-                                                             MemberTypes.Method,
-                                                             bindingFlags))
-            {
-                // Check that the parameter counts and types match, 
-                // with 'loose' matching on generic parameters
-                ParameterInfo[] parameterInfos = methodInfo.GetParameters();
-                if (parameterInfos.Length == parameterTypes.Length)
-                {
-                    int i = 0;
-                    for (; i < parameterInfos.Length; ++i)
-                    {
-                        if (!parameterInfos[i].ParameterType
-                                              .IsSimilarType(parameterTypes[i]))
-                            break;
-                    }
-                    if (i == parameterInfos.Length)
-                    {
-                        if (matchingMethod == null)
-                            matchingMethod = methodInfo;
-                        else
-                            throw new AmbiguousMatchException(
-                                   "More than one matching method found!");
-                    }
-                }
-            }
-        }
-
-        private static bool IsSimilarType(this Type thisType, Type type)
-        {
-            // Ignore any 'ref' types
-            if (thisType.IsByRef)
-                thisType = thisType.GetElementType();
-            if (type.IsByRef)
-                type = type.GetElementType();
-
-            // Handle array types
-            if (thisType.IsArray && type.IsArray)
-                return thisType.GetElementType().IsSimilarType(type.GetElementType());
-
-            // If the types are identical, or they're both generic parameters 
-            // or the special 'T' type, treat as a match
-            if (thisType == type || ((thisType.IsGenericParameter || thisType == typeof(T))
-                                 && (type.IsGenericParameter || type == typeof(T))))
-                return true;
-
-            // Handle any generic arguments
-            if (thisType.IsGenericType && type.IsGenericType)
-            {
-                Type[] thisArguments = thisType.GetGenericArguments();
-                Type[] arguments = type.GetGenericArguments();
-                if (thisArguments.Length == arguments.Length)
-                {
-                    for (int i = 0; i < thisArguments.Length; ++i)
-                    {
-                        if (!thisArguments[i].IsSimilarType(arguments[i]))
-                            return false;
-                    }
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public class T
-        { }
     }
 }

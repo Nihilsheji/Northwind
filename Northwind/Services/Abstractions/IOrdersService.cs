@@ -15,9 +15,9 @@ namespace Northwind.Services.Abstractions
         Task<IEnumerable<OrderListView>> GetOrdersListViewForCustomer(string customerId);
         Task<IEnumerable<OrderListView>> GetOrdersListViewForShipper(int shipperId);
         Task<IEnumerable<OrderListView>> GetOrdersListViewForProduct(int productId);
-        Task<Order> GetOrderWithDetailsAndProducts(int orderId);
         Task<IEnumerable<OrderListView>> GetOrdersListView();
         Task<IEnumerable<OrderListView>> GetFilteredOrdersListView(GetRequest req);
+        Task<int> GetFilteredOrdersListViewCount(GetRequest req);
         Task<Order> CreateOrder(CreateOrderRequest req);
         Task<bool> RemoveOrder(int orderId);
     }

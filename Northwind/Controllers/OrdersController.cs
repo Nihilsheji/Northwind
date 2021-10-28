@@ -112,10 +112,27 @@ namespace Northwind.Controllers
         }
 
         [HttpPost]
-        [Route("filter")]
-        public async Task<ActionResult<IEnumerable<OrderListView>>> GetFilteredOrdersListView([FromBody] GetRequest req) 
+        [Route("filter/list")]
+        public async Task<ActionResult<IEnumerable<OrderListView>>> GetFilteredOrdersListView([FromBody] GetRequest req)
         {
             var result = await _orders.GetFilteredOrdersListView(req);
+
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("count")]
+        public async Task<ActionResult<int>> GetCount()
+        {
+            var result = await _orders.GetCount();
+
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("filter/list/count")]
+        public async Task<ActionResult<int>> GetFilteredOrdersListViewCount([FromBody] GetRequest req) {
+            var result = await _orders.GetFilteredOrdersListViewCount(req);
 
             return Ok(result);
         }

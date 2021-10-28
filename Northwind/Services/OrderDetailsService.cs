@@ -24,9 +24,9 @@ namespace Northwind.Services
 
         public async Task<bool> RemoveOrderDetails(RemoveOrderDetailsRequest req)
         {
-            var product = await _context.GetEntity(_context.GetDbSet<Product>(), req.ProductId);
+            var product = await _context.GetEntity<Product, int>(req.ProductId);
 
-            var details = await _context.GetEntity(_context.GetDbSet<OrderDetails>(), new GetSingleQueryOptions<OrderDetails>()
+            var details = await _context.GetEntity(new GetSingleQueryOptions<OrderDetails>()
             {
                 Filter = (OrderDetails d) => d.OrderId == req.OrderId && d.ProductId == req.ProductId
             });
@@ -34,7 +34,7 @@ namespace Northwind.Services
             product.UnitsOnOrder -= details.Quantity;
             product.UnitsInStock += details.Quantity;
 
-            var result = _context.DeleteEntity(_context.GetDbSet<OrderDetails>(), details);
+            var result = _context.DeleteEntity<OrderDetails>(details);
 
             await _context.SaveChangesAsync();
 
@@ -43,9 +43,9 @@ namespace Northwind.Services
 
         public async Task<OrderDetails> UpdateOrderDetails(UpdateOrderDetailsRequest req)
         {
-            var product = await _context.GetEntity(_context.GetDbSet<Product>(), req.ProductId);
+            var product = await _context.GetEntity<Product, int>(req.ProductId);
 
-            var details = await _context.GetEntity(_context.GetDbSet<OrderDetails>(), new GetSingleQueryOptions<OrderDetails>()
+            var details = await _context.GetEntity(new GetSingleQueryOptions<OrderDetails>()
             {
                 Filter = (OrderDetails d) => d.OrderId == req.OrderId && d.ProductId == req.ProductId
             });
@@ -59,7 +59,7 @@ namespace Northwind.Services
             details.Discount = req.Discount;
             details.UnitPrice = req.UnitPrice; //Handle price assingment
 
-            var result = _context.UpdateEntity(_context.GetDbSet<OrderDetails>(), details);
+            var result = _context.UpdateEntity(details);
 
             await _context.SaveChangesAsync();
 
@@ -68,9 +68,9 @@ namespace Northwind.Services
 
         public async Task<OrderDetails> CreateOrderDetails(CreateOrderDetailsRequest req)
         {
-            var product = await _context.GetEntity(_context.GetDbSet<Product>(), req.ProductId);
+            var product = await _context.GetEntity<Product, int>(req.ProductId);
 
-            var details = await _context.GetEntity(_context.GetDbSet<OrderDetails>(), new GetSingleQueryOptions<OrderDetails>()
+            var details = await _context.GetEntity(new GetSingleQueryOptions<OrderDetails>()
             {
                 Filter = (OrderDetails d) => d.OrderId == req.OrderId && d.ProductId == req.ProductId
             });
@@ -86,7 +86,7 @@ namespace Northwind.Services
             details.Discount = req.Discount;
             details.UnitPrice = req.UnitPrice;
 
-            var result = _context.CreateEntity(_context.GetDbSet<OrderDetails>(), details);
+            var result = _context.CreateEntity(details);
 
             await _context.SaveChangesAsync();
 
@@ -95,7 +95,7 @@ namespace Northwind.Services
 
         public async Task<IEnumerable<OrderDetailsListView>> GetOrderDetailsListViewForOrder(int orderId)
         {
-            var details = await _context.GetEntities(_context.GetDbSet<Order>(), new GetQueryOptions<Order, OrderDetailsListView>()
+            var details = await _context.GetEntities(new GetQueryOptions<Order, OrderDetailsListView>()
             {
                 Filter = (Order o) => o.Id == orderId,
                 Includes = (IQueryable<Order> q) => 

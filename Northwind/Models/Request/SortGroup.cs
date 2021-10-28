@@ -1,8 +1,6 @@
-﻿using Northwind.Models.Abstractions;
+﻿using Northwind.Utility;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Northwind.Models.Request
 {
@@ -10,14 +8,16 @@ namespace Northwind.Models.Request
     {
         public IEnumerable<Sort> Sort { get; set; }
 
-        public IEnumerable<SortExpression> GetSortExpressions<T>() where T : IExpAccess<T>
+        public IEnumerable<SortExpression> GetSortExpressions<T>()
         {
             var result = new List<SortExpression>();
 
             foreach(var sort in Sort)
             {
                 Type t = null;
-                var exp = sort.GetExpression<T>(ref t);
+                var exp = sort.GetExpression<T>();
+                t = PropertyAccessor<T>.GetPropertyInfo(sort.Property).PropertyType;
+
                 var sortExp = new SortExpression()
                 {
                     Ascending = sort.Ascending,

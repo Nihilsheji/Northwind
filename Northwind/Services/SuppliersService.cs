@@ -25,7 +25,7 @@ namespace Northwind.Services
 
         public async Task<IEnumerable<SupplierListView>> GetSuppliersListView()
         {
-            return await _context.GetEntities(_context.GetDbSet<Supplier>(), new GetQueryOptions<Supplier, SupplierListView>
+            return await _context.GetEntities(new GetQueryOptions<Supplier, SupplierListView>
             {
                 Select = (IQueryable<Supplier> q) => q.Select((Supplier s) => new SupplierListView()
                 {

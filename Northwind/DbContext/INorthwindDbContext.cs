@@ -11,30 +11,29 @@ namespace Northwind.DbContexts
     public interface INorthwindDbContext
     {
 
-        Task<int> GetCount<T>(DbSet<T> set) where T : class;
-        Task<int> GetCount<T>(DbSet<T> set, GetQueryOptions<T> opt) where T : class;
-        Task<int> GetCount<T, TResult>(DbSet<T> set, GetQueryOptions<T, TResult> opt) where T : class;
+        Task<int> GetCount<T>() where T : class;
+        Task<int> GetCount<T>(GetQueryOptions<T> opt) where T : class;
+        Task<int> GetCount<T, TResult>(GetQueryOptions<T, TResult> opt) where T : class;
 
 
-        Task<T> GetEntity<T, KeyType>(DbSet<T> set, KeyType id) where T : class;
-        Task<T> GetEntity<T>(DbSet<T> set, GetSingleQueryOptions<T> opt) where T : class;
-        Task<TResult> GetEntity<T, TResult>(DbSet<T> set, GetSingleQueryOptions<T, TResult> opt) where T : class;
+        Task<T> GetEntity<T, KeyType>(KeyType id) where T : class;
+        Task<T> GetEntity<T>(GetSingleQueryOptions<T> opt) where T : class;
+        Task<TResult> GetEntity<T, TResult>(GetSingleQueryOptions<T, TResult> opt) where T : class;
 
-        Task<IEnumerable<T>> GetEntities<T>(DbSet<T> set) where T : class;
-        Task<IEnumerable<T>> GetEntities<T, KeyType>(DbSet<T> set, IEnumerable<KeyType> ids) where T : class;
-        Task<IEnumerable<T>> GetEntities<T>(DbSet<T> set, GetQueryOptions<T> opt) where T : class;
-        Task<IEnumerable<TResult>> GetEntities<T, TResult>(DbSet<T> set, GetQueryOptions<T, TResult> opt) where T : class;
+        Task<IEnumerable<T>> GetEntities<T>() where T : class;
+        Task<IEnumerable<T>> GetEntities<T, KeyType>(IEnumerable<KeyType> ids) where T : class;
+        Task<IEnumerable<T>> GetEntities<T>(GetQueryOptions<T> opt) where T : class;
+        Task<IEnumerable<TResult>> GetEntities<T, TResult>(GetQueryOptions<T, TResult> opt) where T : class;
 
-        T CreateEntity<T>(DbSet<T> set, T entity) where T : class;
-        IEnumerable<T> CreateEntities<T>(DbSet<T> set, IEnumerable<T> entities) where T : class;
+        T CreateEntity<T>(T entity) where T : class;
+        IEnumerable<T> CreateEntities<T>(IEnumerable<T> entities) where T : class;
 
-        T UpdateEntity<T>(DbSet<T> set, T entity) where T : class;
+        T UpdateEntity<T>(T entity) where T : class;
 
-        T DeleteEntity<T>(DbSet<T> set, T entity) where T : class;
-        IEnumerable<T> DeleteEntities<T>(DbSet<T> set, IEnumerable<T> entity) where T : class;
+        T DeleteEntity<T>(T entity) where T : class;
+        IEnumerable<T> DeleteEntities<T>(IEnumerable<T> entity) where T : class;
 
         Task SaveChangesAsync();
-        DbSet<T> GetDbSet<T>() where T : class;
         
     }
 }

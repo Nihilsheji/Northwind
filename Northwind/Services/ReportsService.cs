@@ -23,7 +23,7 @@ namespace Northwind.Services
 
         public async Task<IEnumerable<ProductReportView>> GetBestSellingProducts()
         {
-            var products = await _context.GetEntities(_context.GetDbSet<Product>(), new GetQueryOptions<Product, ProductReportView>()
+            var products = await _context.GetEntities(new GetQueryOptions<Product, ProductReportView>()
             {
                 Includes = (IQueryable<Product> q) =>
                     q.Include(p => p.OrderDetails).ThenInclude(od => od.Order),
@@ -41,7 +41,7 @@ namespace Northwind.Services
 
         public async Task<IEnumerable<ProductReportView>> GetMostSellingProducts()
         {
-            var products = await _context.GetEntities(_context.GetDbSet<Product>(), new GetQueryOptions<Product, ProductReportView>()
+            var products = await _context.GetEntities(new GetQueryOptions<Product, ProductReportView>()
             {
                 Includes = (IQueryable<Product> q) =>
                     q.Include(p => p.OrderDetails).ThenInclude(od => od.Order),
@@ -61,7 +61,7 @@ namespace Northwind.Services
         public async Task<IEnumerable<ProductSalesView>> GetProductSaleStatistics(int productId, GetStatisticsRequest req)
         {
 
-            var products = await _context.GetEntities(_context.GetDbSet<Product>(), new GetQueryOptions<Product, ProductSalesViewBase>()
+            var products = await _context.GetEntities(new GetQueryOptions<Product, ProductSalesViewBase>()
             {
                 Includes = (IQueryable<Product> q) =>
                     q.Include(p => p.OrderDetails).ThenInclude(od => od.Order),
@@ -113,7 +113,7 @@ namespace Northwind.Services
 
         public async Task<IEnumerable<EmployeeReportView>> GetBestSellingEmployees()
         {
-            var employees = await _context.GetEntities(_context.GetDbSet<Employee>(), new GetQueryOptions<Employee, EmployeeReportView>()
+            var employees = await _context.GetEntities(new GetQueryOptions<Employee, EmployeeReportView>()
             {
                 Includes = (IQueryable<Employee> q) =>
                     q.Include(p => p.Orders).ThenInclude(o => o.OrderDetails),
@@ -133,7 +133,7 @@ namespace Northwind.Services
 
         public async Task<IEnumerable<CustomerReportView>> GetBestBuyingCustomers()
         {
-            var customers = await _context.GetEntities(_context.GetDbSet<Customer>(), new GetQueryOptions<Customer, CustomerReportView>()
+            var customers = await _context.GetEntities(new GetQueryOptions<Customer, CustomerReportView>()
             {
                 Includes = (IQueryable<Customer> q) =>
                     q.Include(c => c.Orders).ThenInclude(o => o.OrderDetails),
@@ -152,7 +152,7 @@ namespace Northwind.Services
 
         public async Task<IEnumerable<PopularityReportView>> GetMostPopularCategories()
         {
-            var categories = await _context.GetEntities(_context.GetDbSet<Category>(), new GetQueryOptions<Category, PopularityReportView>()
+            var categories = await _context.GetEntities(new GetQueryOptions<Category, PopularityReportView>()
             {
                 Includes = (IQueryable<Category> q) => q.Include(c => c.Products).ThenInclude(p => p.OrderDetails),
                 Select = (IQueryable<Category> q) => 
