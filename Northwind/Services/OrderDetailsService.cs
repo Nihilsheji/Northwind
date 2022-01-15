@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Northwind.Services
 {
-    public class OrderDetailsService : CrudServiceBase<OrderDetails>, IOrderDetailsService
+    public class OrderDetailsService : CrudServiceBase<OrderDetails, int>, IOrderDetailsService
     {
         private readonly INorthwindDbContext _context;
         private readonly IMapper _mapper;

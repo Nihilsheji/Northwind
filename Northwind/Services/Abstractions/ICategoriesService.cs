@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Northwind.Services.Abstractions
 {
-    public interface ICategoriesService : ICrudServiceBase<Category>
+    public interface ICategoriesService : ICrudServiceBase<Category, int>
     {
         Task<IEnumerable<DictionaryValue<int, string>>> GetDictionary();
     }

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Northwind.DbContexts.Queries;
 using Northwind.Models.Entities;
+using Northwind.Models.Interfaces;
 
 namespace Northwind.DbContexts
 {
@@ -292,11 +293,11 @@ namespace Northwind.DbContexts
             return await set.ToListAsync();
         }
 
-        public async Task<IEnumerable<T>> GetEntities<T, KeyType>(IEnumerable<KeyType> ids) where T : class
+        public async Task<IEnumerable<T>> GetEntities<T, KeyType>(IEnumerable<KeyType> ids) where T : class, IIdentificable<KeyType>
         {
             var set = GetDbSet<T>();
 
-            return await set.ToListAsync();
+            return await set.Where(x => ids.Contains(x.Id)).ToListAsync();
         }
 
         public async Task<IEnumerable<T>> GetEntities<T>(GetQueryOptions<T> opt) where T : class

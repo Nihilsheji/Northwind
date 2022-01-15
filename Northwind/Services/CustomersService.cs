@@ -13,7 +13,7 @@ using Northwind.Models.Request.Demographic;
 
 namespace Northwind.Services
 {
-    public class CustomersService : CrudServiceBase<Customer>, ICustomersService
+    public class CustomersService : CrudServiceBase<Customer, string>, ICustomersService
     {
         private readonly INorthwindDbContext _context;
         private readonly IMapper _mapper;

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Northwind.Services.Abstractions
 {
-    public interface ICustomersService : ICrudServiceBase<Customer>
+    public interface ICustomersService : ICrudServiceBase<Customer, string>
     {
         Task<IEnumerable<Customer>> GetCustomersForDemographic(int demographicId);
         Task<IEnumerable<CustomerListView>> GetCustomersListViewForDemographic(int demographicId);

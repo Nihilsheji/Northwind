@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Northwind.Services
 {
-    public class OrdersService : CrudServiceBase<Order>, IOrdersService
+    public class OrdersService : CrudServiceBase<Order, int>, IOrdersService
     {
         private readonly INorthwindDbContext _context;
         private readonly IMapper _mapper;
@@ -270,7 +270,7 @@ namespace Northwind.Services
 
             order.OrderDate = DateTime.Now.ToUniversalTime();
 
-            var productIds = order.OrderDetails.Select(d => d.OrderId);
+            var productIds = order.OrderDetails.Select(d => d.ProductId);
 
             var products = await _context.GetEntities<Product, int>(productIds);
 

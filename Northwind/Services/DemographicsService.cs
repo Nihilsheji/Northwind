@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Northwind.Services
 {
-    public class DemographicsService : CrudServiceBase<Demographic>, IDemographicsService
+    public class DemographicsService : CrudServiceBase<Demographic, int>, IDemographicsService
     {
         private readonly INorthwindDbContext _context;
 

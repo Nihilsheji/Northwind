@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Northwind.Models.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Northwind.Models.Entities
 {
-    public class Territory
+    public class Territory : IIdentificable<int>
     {
         public int Id { get; set; }
         public string Description { get; set; }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Northwind.Services.Abstractions
 {
-    public interface ITerritoriesService : ICrudServiceBase<Territory>
+    public interface ITerritoriesService : ICrudServiceBase<Territory, int>
     {
         Task<IEnumerable<Territory>> GetTerritoriesForRegion(int regionId);
         Task<IEnumerable<Territory>> GetTerritoriesForEmployee(int employeeId);

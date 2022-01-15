@@ -32,7 +32,7 @@ namespace Northwind.Services
                     q.Select(a => new ProductReportView() { 
                         Id = a.Id,
                         Name = a.ProductName,
-                        Total = a.OrderDetails.Select(x => x.Quantity * x.UnitPrice).Sum()
+                        Total = a.OrderDetails.Select(x => x.Quantity * Convert.ToDecimal(x.UnitPrice)).Sum()
                     }).OrderByDescending(x => x.Total)
             });
 
@@ -124,7 +124,7 @@ namespace Northwind.Services
                         Id = e.Id,
                         FirstName = e.FirstName,
                         LastName = e.LastName,
-                        Total = e.Orders.SelectMany(o => o.OrderDetails.Select(od => od.Quantity * od.UnitPrice)).Sum()
+                        Total = e.Orders.SelectMany(o => o.OrderDetails.Select(od => od.Quantity * Convert.ToDecimal(od.UnitPrice))).Sum()
                     }).OrderByDescending(x => x.Total)
             });
 
@@ -143,7 +143,7 @@ namespace Northwind.Services
                     {
                         Id = c.Id,
                         Name = c.CompanyName,
-                        Total = c.Orders.SelectMany(o => o.OrderDetails.Select(od => od.Quantity * od.UnitPrice)).Sum()
+                        Total = c.Orders.SelectMany(o => o.OrderDetails.Select(od => od.Quantity * Convert.ToDecimal(od.UnitPrice))).Sum()
                     }).OrderByDescending(x => x.Total)
             });
 

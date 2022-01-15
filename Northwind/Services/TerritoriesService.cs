@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Northwind.Services
 {
-    public class TerritoriesService : CrudServiceBase<Territory>, ITerritoriesService
+    public class TerritoriesService : CrudServiceBase<Territory, int>, ITerritoriesService
     {
         private readonly INorthwindDbContext _context;
 

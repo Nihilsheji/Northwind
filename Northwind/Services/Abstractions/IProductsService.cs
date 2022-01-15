@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Northwind.Services.Abstractions
 {
-    public interface IProductsService : ICrudServiceBase<Product>
+    public interface IProductsService : ICrudServiceBase<Product, int>
     {
         Task<IEnumerable<Product>> GetProductsForSupplier(int supplierId);
         Task<IEnumerable<ProductListView>> GetProductsListViewForSupplier(int supplierId);

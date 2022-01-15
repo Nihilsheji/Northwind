@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Northwind.Services
 {
-    public class RegionsService : CrudServiceBase<Region>, IRegionsService
+    public class RegionsService : CrudServiceBase<Region, int>, IRegionsService
     {
         private readonly INorthwindDbContext _context;
 

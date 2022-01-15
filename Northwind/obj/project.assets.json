@@ -5768,19 +5768,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\veryg\\.nuget\\packages\\": {}
+    "C:\\Users\\tomas\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\veryg\\source\\repos\\Northwind\\Northwind\\Northwind.csproj",
+      "projectUniqueName": "C:\\Users\\tomas\\Documents\\Northwind\\Northwind\\Northwind.csproj",
       "projectName": "Northwind",
-      "projectPath": "C:\\Users\\veryg\\source\\repos\\Northwind\\Northwind\\Northwind.csproj",
-      "packagesPath": "C:\\Users\\veryg\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\veryg\\source\\repos\\Northwind\\Northwind\\obj\\",
+      "projectPath": "C:\\Users\\tomas\\Documents\\Northwind\\Northwind\\Northwind.csproj",
+      "packagesPath": "C:\\Users\\tomas\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\tomas\\Documents\\Northwind\\Northwind\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\veryg\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\tomas\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -5857,7 +5857,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.402\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
       }
     }
   }

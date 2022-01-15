@@ -1,5 +1,6 @@
 ﻿using Northwind.DbContexts;
 using Northwind.DbContexts.Queries;
+using Northwind.Models.Interfaces;
 using Northwind.Models.Response;
 using Northwind.Services.Abstractions;
 using System;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Northwind.Services
 {
-    public class CrudServiceBase<T> : ICrudServiceBase<T> where T : class
+    public class CrudServiceBase<T, KeyType> : ICrudServiceBase<T, KeyType> where T : class, IIdentificable<KeyType>
     {
         private readonly INorthwindDbContext _context;
         
@@ -55,24 +56,19 @@ namespace Northwind.Services
             return await _context.GetEntities<T>();
         }
 
-        public async Task<T> Get<KeyType>(KeyType id)
+        public async Task<T> Get(KeyType id)
         {
             return await _context.GetEntity<T, KeyType>(id);
-        }
-
-        public async Task<T> Get<KeyType>(GetSingleQueryOptions<T> opt)
-        {
-            return await _context.GetEntity(opt);
-        }
-
-        public async Task<IEnumerable<T>> Get<KeyType>(IEnumerable<KeyType> ids)
-        {
-            return await _context.GetEntities<T, KeyType>(ids);
         }
 
         public async Task<T> Get(GetSingleQueryOptions<T> opt)
         {
             return await _context.GetEntity(opt);
+        }
+
+        public async Task<IEnumerable<T>> Get(IEnumerable<KeyType> ids)
+        {
+            return await _context.GetEntities<T, KeyType>(ids);
         }
 
         public async Task<TResult> Get<TResult>(GetSingleQueryOptions<T, TResult> opt)
@@ -107,7 +103,7 @@ namespace Northwind.Services
             return updated;
         }
 
-        public async Task<bool> Remove<KeyType>(KeyType id) {
+        public async Task<bool> Remove(KeyType id) {
             var entity = await _context.GetEntity<T, KeyType>(id);
             
             if(entity == null)
@@ -122,7 +118,7 @@ namespace Northwind.Services
             return true;
         }
 
-        public async Task<bool> Remove<KeyType>(IEnumerable<KeyType> ids)
+        public async Task<bool> Remove(IEnumerable<KeyType> ids)
         {
             var entities = await _context.GetEntities<T, KeyType>(ids);
 

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Northwind.Services.Abstractions
 {
-    public interface IOrderDetailsService : ICrudServiceBase<OrderDetails>
+    public interface IOrderDetailsService : ICrudServiceBase<OrderDetails, int>
     {
         Task<bool> RemoveOrderDetails(RemoveOrderDetailsRequest req);
         Task<OrderDetails> UpdateOrderDetails(UpdateOrderDetailsRequest req);

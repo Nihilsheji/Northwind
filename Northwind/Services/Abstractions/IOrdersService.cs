@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Northwind.Services.Abstractions
 {
-    public interface IOrdersService : ICrudServiceBase<Order>
+    public interface IOrdersService : ICrudServiceBase<Order, int>
     {
         Task<IEnumerable<OrderListView>> GetOrdersListViewForEmployee(int employeeId);
         Task<IEnumerable<OrderListView>> GetOrdersListViewForCustomer(string customerId);

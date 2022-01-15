@@ -1,0 +1,182 @@
+Category
+Post
+{
+  "name": "Things",
+  "description": "Some random things",
+  "picture": null
+}
+Filter
+{
+  "page": 1,
+  "itemsPerPage": 3,
+  
+  "sorting": {
+    "sort": [
+      {
+        "property": "name",
+        "ascending": false
+      }
+    ]
+  }
+}
+{
+  "page": 2,
+  "itemsPerPage": 3,
+  
+  "sorting": {
+    "sort": [
+      {
+        "property": "name",
+        "ascending": false
+      }
+    ]
+  }
+}
+{
+  "page": 1,
+  "itemsPerPage": 3,
+  "filters": {
+    "operator": 1,
+    "filters": [
+      {
+        "property": "name",
+        "operator": 4,
+        "value": "a"
+      }
+    ]
+  },
+  "sorting": {
+    "sort": [
+      {
+        "property": "name",
+        "ascending": true
+      }
+    ]
+  }
+}
+
+Put
+{
+  "name": "Category",
+  "description": "Some category",
+  "picture": "string"
+}
+
+Supplier
+Post
+{
+  "companyName": "Someplier",
+  "contactName": "Someone",
+  "contactTitle": "Somebody",
+  "address": "Somewhere",
+  "city": "Sometown",
+  "region": "Somegion",
+  "postalCode": "00-000",
+  "country": "Sometry",
+  "phone": "+00 00000000",
+  "fax": "+01 00000000",
+  "homePage": "www.someplier.com"
+}
+
+Region
+Post
+{
+  "regionDescription": "Somegion",
+  "territories": [
+    {
+      "territoryDescription": "Sometergion1",
+      "regionId": 0
+    }, {
+      "territoryDescription": "Sometergion2",
+    }
+  ]
+}
+
+Territory
+Post
+{
+  "territoryDescription": "Somerittory",
+  "regionId": 1
+}
+
+Customer
+{
+  "id": "SMTH",
+  "companyName": "Something",
+  "contactName": "Someone",
+  "contactTitle": "Somebody",
+  "address": "Somewhere",
+  "city": "Sometown",
+  "region": "Somewhere",
+  "postalCode": "000-00",
+  "country": "Sometry",
+  "phone": "+00 000000000",
+  "fax": "+01 000000000",
+  "existingDemographics": [
+    1,
+    2
+  ],
+  "demographics": [
+    {
+      "customerDesc": "Rich"
+    }
+  ]
+}
+
+Product
+{
+  "productName": "Someduct",
+  "supplierId": 1,
+  "categoryId": 1,
+  "quantityPerUnit": 1,
+  "unitPrice": 100,
+  "unitsInStock": 10000,
+  "reorderLevel": 1
+}
+
+Order
+{
+  "customerId": "SMTH",
+  "employeeId": 1,
+  "requiredDate": "2022-01-15T14:35:51.923Z",
+  "shipViaId": 1,
+  "freight": 1,
+  "shipName": "Someship",
+  "shipAddress": "Someddress",
+  "shipCity": "Sometown",
+  "shipRegion": "Somegion",
+  "shipPostalCode": "00-000",
+  "shipCountry": "Cometry",
+  "orderDetails": [
+    {
+      "orderId": 1,
+      "productId": 1,
+      "unitPrice": 100,
+      "quantity": 1,
+      "discount": 10
+    },
+    {
+      "orderId": 1,
+      "productId": 2,
+      "unitPrice": 200,
+      "quantity": 2,
+      "discount": 0
+    }
+  ]
+}
+
+Order Filter Count
+{
+  "page": 1,
+  "itemsPerPage": 10,
+  "filters": {
+    "operator": 1,
+    "filters": [
+      {
+        "property": "shipName",
+        "operator": 4,
+        "value": "ab"
+      }
+    ]
+  }
+}

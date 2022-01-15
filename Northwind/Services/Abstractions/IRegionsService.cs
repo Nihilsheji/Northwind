@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Northwind.Services.Abstractions
 {
-    public interface IRegionsService : ICrudServiceBase<Region>
+    public interface IRegionsService : ICrudServiceBase<Region, int>
     {
     }
 }

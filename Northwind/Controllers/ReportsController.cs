@@ -52,7 +52,7 @@ namespace Northwind.Controllers
         [Route("products/{productId}/statistics")]
         public async Task<ActionResult<IEnumerable<ProductSalesView>>> GetSaleStatisticsForProduct(int productId, [FromBody] GetStatisticsRequest req)
         {
-            var result = await _reports.GetProductSaleStatistics(productId, new GetStatisticsRequest() { Span = StatisticsSpan.Day });
+            var result = await _reports.GetProductSaleStatistics(productId, req);
 
             return Ok(result);
         }

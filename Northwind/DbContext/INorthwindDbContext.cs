@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Northwind.DbContexts.Queries;
 using Northwind.Models.Entities;
+using Northwind.Models.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace Northwind.DbContexts
         Task<TResult> GetEntity<T, TResult>(GetSingleQueryOptions<T, TResult> opt) where T : class;
 
         Task<IEnumerable<T>> GetEntities<T>() where T : class;
-        Task<IEnumerable<T>> GetEntities<T, KeyType>(IEnumerable<KeyType> ids) where T : class;
+        Task<IEnumerable<T>> GetEntities<T, KeyType>(IEnumerable<KeyType> ids) where T : class, IIdentificable<KeyType>;
         Task<IEnumerable<T>> GetEntities<T>(GetQueryOptions<T> opt) where T : class;
         Task<IEnumerable<TResult>> GetEntities<T, TResult>(GetQueryOptions<T, TResult> opt) where T : class;
 

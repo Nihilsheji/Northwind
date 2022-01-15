@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Northwind.Services
 {
-    public class EmployeesService : CrudServiceBase<Employee>, IEmployeesService
+    public class EmployeesService : CrudServiceBase<Employee, int>, IEmployeesService
     {
         private readonly INorthwindDbContext _context;
 

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Northwind.Services.Abstractions
 {
-    public interface IEmployeesService : ICrudServiceBase<Employee>
+    public interface IEmployeesService : ICrudServiceBase<Employee, int>
     {
         Task<IEnumerable<Employee>> GetEmployeesForTerritory(int territoryId);
         Task<IEnumerable<DictionaryValue<int, string>>> GetDictionary();

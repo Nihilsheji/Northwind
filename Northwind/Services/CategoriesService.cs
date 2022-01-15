@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Northwind.Services
 {
-    public class CategoriesService : CrudServiceBase<Category>, ICategoriesService
+    public class CategoriesService : CrudServiceBase<Category, int>, ICategoriesService
     {
         private readonly INorthwindDbContext _context;
         public CategoriesService(INorthwindDbContext context) : base(context)

@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Northwind.Models.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 
 namespace Northwind.Models.Entities
 {
-    public class Category
+    public class Category : IIdentificable<int>
     {
         public static Dictionary<string, LambdaExpression> PropDictionary { get; }
            = new Dictionary<string, LambdaExpression>()

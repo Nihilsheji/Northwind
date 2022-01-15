@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Northwind.Services.Abstractions
 {
-    public interface IShippersService : ICrudServiceBase<Shipper>
+    public interface IShippersService : ICrudServiceBase<Shipper, int>
     {
     }
 }

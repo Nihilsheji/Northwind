@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Northwind.Services
 {
-    public class ShippersService : CrudServiceBase<Shipper>, IShippersService
+    public class ShippersService : CrudServiceBase<Shipper, int>, IShippersService
     {
         private readonly INorthwindDbContext _context;
 

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Northwind.Services
 {
-    public class SuppliersService : CrudServiceBase<Supplier>, ISuppliersService
+    public class SuppliersService : CrudServiceBase<Supplier, int>, ISuppliersService
     {
         private readonly INorthwindDbContext _context;
         public SuppliersService(INorthwindDbContext context) : base(context)

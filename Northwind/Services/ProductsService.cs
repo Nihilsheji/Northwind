@@ -10,7 +10,7 @@ using Northwind.Models.Response;
 
 namespace Northwind.Services
 {
-    public class ProductsService : CrudServiceBase<Product>, IProductsService
+    public class ProductsService : CrudServiceBase<Product, int>, IProductsService
     {
         private readonly INorthwindDbContext _context;
         public ProductsService(INorthwindDbContext context) : base(context)
