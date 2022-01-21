@@ -10,6 +10,7 @@ namespace Northwind.Services.Abstractions
     public interface IDemographicsService : ICrudServiceBase<Demographic, int>
     {
         Task<IEnumerable<Demographic>> GetCustomersForDemographic(string demographicId);
+        Task<IEnumerable<Demographic>> GetDemographicsForCustomer(string customerId);
 
         Task<IEnumerable<DictionaryValue<int, string>>> GetDictionary();
 

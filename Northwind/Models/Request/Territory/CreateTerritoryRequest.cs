@@ -7,7 +7,7 @@ namespace Northwind.Models.Request.Territory
 {
     public class CreateTerritoryRequest
     {
-        public string TerritoryDescription { get; set; }
+        public string Description { get; set; }
         public int RegionId { get; set; }
     }
 }

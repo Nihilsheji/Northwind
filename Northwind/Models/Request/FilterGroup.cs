@@ -42,7 +42,7 @@ namespace Northwind.Models.Request
                         foreach (var groupExp in Groups)
                         {
                             var exp = groupExp.GetExpression<T>();
-                            res.And(exp);
+                            res = Exp.And(res, exp);
                         }
                     }
                     break;
@@ -56,7 +56,7 @@ namespace Northwind.Models.Request
                         foreach (var groupExp in Groups)
                         {
                             var exp = groupExp.GetExpression<T>();
-                            res.Or(exp);
+                            res = Exp.Or(res, exp);
                         }
                     }
                     break;

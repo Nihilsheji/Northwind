@@ -30,6 +30,17 @@ namespace Northwind.Services
             return demo.Demographics;
         }
 
+        public async Task<IEnumerable<Demographic>> GetDemographicsForCustomer(string customerId)
+        {
+            var cust = await _context.GetEntity(new GetSingleQueryOptions<Customer>()
+            {
+                Filter = (Customer c) => c.Id == customerId,
+                Includes = (IQueryable<Customer> q) => q.Include(c => c.Demographics),
+            });
+
+            return cust.Demographics;
+        }
+
         public async Task<IEnumerable<DictionaryValue<int, string>>> GetDictionary()
         {
             return await GetDictionary<int, string>((Demographic d) => new DictionaryValue<int, string>() { Key = d.Id, Value = d.CustomerDesc });

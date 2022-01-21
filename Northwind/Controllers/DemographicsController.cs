@@ -55,6 +55,15 @@ namespace Northwind.Controllers
             return Ok(_mapper.Map<IEnumerable<DemographicView>>(result));
         }
 
+        [HttpGet]
+        [Route("/customers/{customerId}/demographics")]
+        public async Task<ActionResult<IEnumerable<DemographicView>>> GetDemographicsForUser(string customerId)
+        {
+            var result = await _demo.GetDemographicsForCustomer(customerId);
+
+            return Ok(_mapper.Map<IEnumerable<DemographicView>>(result));
+        }
+
         [HttpPost]
         [Route("{demographicId}/customers/{customerId}")]
         public async Task<ActionResult<bool>> AddCustomerToDemographic(int demographicId, string customerId)
